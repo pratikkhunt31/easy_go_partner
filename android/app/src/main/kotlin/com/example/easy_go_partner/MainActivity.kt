@@ -1,4 +1,4 @@
-package com.example.easy_go_partner
+package com.easy_go.partner
 
 import io.flutter.embedding.android.FlutterActivity
 

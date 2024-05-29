@@ -21,11 +21,8 @@ class _SplashScreenState extends State<SplashScreen> {
         if (user == null && mounted) {
           Get.to(() => NumberScreen());
         }
-        // else if (currentUser!.phoneNumber!.isEmpty){
-        //   Get.offAll(() => HomeView());
-        // }
         else {
-          Get.to(() => HomeView());
+          Get.off(() => HomeView());
         }
       });
     });

@@ -60,34 +60,34 @@ class AuthController extends GetxController {
     }
   }
 
-  saveUserInfo(String name, String email, String phone) async {
-    try {
-      if (currentUser != null) {
-        Map users = {
-          'id': currentUser!.uid,
-          'name': name.trim(),
-          'email': email.trim(),
-          'phone': phone.trim(),
-        };
-
-        DatabaseReference database = FirebaseDatabase.instance.ref();
-
-        await database.child('drivers').child(currentUser!.uid).set(users);
-
-        // Navigator.pop(context); // Close the dialog
-        // Get.offAll(() => const HomeScreen());
-        successSnackBar("Account created successfully");
-      } else {
-        // Navigator.pop(context); // Close the dialog
-        validSnackBar("Account has not been created");
-      }
-    } catch (e) {
-      // Navigator.pop(context); // Close the dialog
-      validSnackBar("Error saving user information: $e");
-    }
-
-    // final User firebaseUser = (await auth.c);
-  }
+  // saveUserInfo(String name, String email, String phone) async {
+  //   try {
+  //     if (currentUser != null) {
+  //       Map users = {
+  //         'id': currentUser!.uid,
+  //         'name': name.trim(),
+  //         'email': email.trim(),
+  //         'phone': phone.trim(),
+  //       };
+  //
+  //       DatabaseReference database = FirebaseDatabase.instance.ref();
+  //
+  //       await database.child('drivers').child(currentUser!.uid).set(users);
+  //
+  //       // Navigator.pop(context); // Close the dialog
+  //       // Get.offAll(() => const HomeScreen());
+  //       successSnackBar("Account created successfully");
+  //     } else {
+  //       // Navigator.pop(context); // Close the dialog
+  //       validSnackBar("Account has not been created");
+  //     }
+  //   } catch (e) {
+  //     // Navigator.pop(context); // Close the dialog
+  //     validSnackBar("Error saving user information: $e");
+  //   }
+  //
+  //   // final User firebaseUser = (await auth.c);
+  // }
 
   Future<bool> checkUserDataExists(String phoneNumber) async {
     try {

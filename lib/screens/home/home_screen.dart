@@ -1,4 +1,6 @@
+import 'package:easy_go_partner/controller/driver_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -8,6 +10,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  DriverController driverController = Get.put(DriverController());
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -83,7 +86,20 @@ class _HomeScreenState extends State<HomeScreen> {
                   style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green,
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    driverController.getRideRequests();
+                  },
+                  child: Text("Accept"),
+                ),
+              ),
+              Center(
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                  ),
+                  onPressed: () {
+                    driverController.acceptRequest();
+                  },
                   child: Text("Accept"),
                 ),
               ),

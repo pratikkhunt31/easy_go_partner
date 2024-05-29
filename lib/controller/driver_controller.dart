@@ -9,7 +9,6 @@ import 'package:path/path.dart';
 
 import '../consts/firebase_consts.dart';
 
-
 class DriverController extends GetxController {
   ValueNotifier<String?> selectedVehicleNotifier = ValueNotifier<String?>(null);
 
@@ -22,22 +21,20 @@ class DriverController extends GetxController {
   TextEditingController vNumController = TextEditingController();
   TextEditingController dLController = TextEditingController();
 
-
   File? rcBookImg;
   List<File> vehicleImages = [];
   File? licenseImg;
   final picker = ImagePicker();
 
-
   Future<String> uploadFile(File file) async {
     String fileName = basename(file.path);
     var destination = 'images/${currentUser!.uid}/$fileName';
-    Reference firebaseStorageRef = FirebaseStorage.instance.ref().child(destination);
+    Reference firebaseStorageRef =
+        FirebaseStorage.instance.ref().child(destination);
     UploadTask uploadTask = firebaseStorageRef.putFile(file);
     TaskSnapshot taskSnapshot = await uploadTask;
     return await taskSnapshot.ref.getDownloadURL();
   }
-
 
   Future<void> registerUser(String phoneNumber) async {
     try {
@@ -65,6 +62,7 @@ class DriverController extends GetxController {
         'rcNumber': rcNumController.text,
         'vehicleType': selectedVehicleNotifier.value,
         'is_verified': false,
+        'is_online': true,
         'd_id': currentUser!.uid,
         'rcBookImage': rcBookImageUrl,
         'vehicleImages': vehicleImageUrls,
@@ -78,6 +76,85 @@ class DriverController extends GetxController {
     } catch (e) {
       error("Error registering user", e);
     }
+  }
+
+  void getRideRequests() async {
+    DatabaseReference rideRequestRef =
+        FirebaseDatabase.instance.ref().child("Ride Request");
+
+    try {
+      DatabaseEvent event = await rideRequestRef.once();
+      DataSnapshot snapshot = event.snapshot;
+
+      if (snapshot.exists && snapshot.value is Map) {
+        Map<dynamic, dynamic> rideRequests =
+            snapshot.value as Map<dynamic, dynamic>;
+
+        rideRequests.forEach((key, value) {
+          if (value is Map) {
+            Map<String, dynamic> rideInfoMap = Map<String, dynamic>.from(value);
+
+            if (rideInfoMap['v_type'] == 'Tempo' &&
+                rideInfoMap['is_online'] == true) {
+              print("Ride Request ID: $key");
+              print("Driver ID: ${rideInfoMap['driver_id']}");
+              print("Payment Status: ${rideInfoMap['payment_status']}");
+              print("Payout: ${rideInfoMap['payout']}");
+              print("Vehicle Type: ${rideInfoMap['v_type']}");
+              print("Pickup Location: ${rideInfoMap['pickUp']}");
+              print("Dropoff Location: ${rideInfoMap['dropOff']}");
+              print("Created At: ${rideInfoMap['created_at']}");
+              print("Rider Name: ${rideInfoMap['rider_name']}");
+              print("Rider Phone: ${rideInfoMap['rider_phone']}");
+              print("Pickup Address: ${rideInfoMap['pickUp_address']}");
+              print("Dropoff Address: ${rideInfoMap['dropOff_address']}");
+            }
+          } else {
+            print("Unexpected data format for ride request ID $key: $value");
+          }
+        });
+      } else {
+        print("No ride requests found or invalid data format.");
+      }
+    } catch (e) {
+      print("Failed to retrieve ride requests: $e");
+    }
+  }
+
+  void acceptRequest() async {
+    DatabaseReference driversRef =
+        FirebaseDatabase.instance.ref().child('drivers');
+    driversRef.once().then((DatabaseEvent event) {
+      Map<String, dynamic> drivers =
+          Map<String, dynamic>.from(event.snapshot.value as Map);
+      drivers.forEach((key, value) {
+        if (value['vehicleType'] == 'Tempo' && value['is_online'] == true) {
+          // Assuming driver ID is stored under key 'driverId' in the drivers database
+          String driverId = currentUser!.uid;
+          DatabaseReference rideRequestRef =
+              FirebaseDatabase.instance.ref().child("Ride Request");
+          rideRequestRef.update({'driver_id': driverId}).then((_) {
+            print('Driver ID updated successfully.');
+          }).catchError((error) {
+            print('Failed to update driver ID: $error');
+          });
+        }
+      });
+    });
+  }
+
+  void listenForRideRequests() {
+    DatabaseReference driverRef = FirebaseDatabase.instance
+        .ref()
+        .child('drivers')
+        .child(currentUser!.uid)
+        .child('newRideRequests');
+    driverRef.onChildAdded.listen((event) {
+      String? rideRequestId = event.snapshot.key;
+      // Notify driver of new ride request
+      // You can show a dialog or notification here
+      print("New ride request: $rideRequestId");
+    });
   }
 
   successSnackBar(String message) {
@@ -116,26 +193,26 @@ class DriverController extends GetxController {
     );
   }
 
-  // Future<void> saveFormData({
-  //   required String name,
-  //   required String phoneNumber,
-  //   required String email,
-  //   required String address,
-  //   required String rcNumber,
-  //   required String vehicleType,
-  //   required String rcBookImageUrl,
-  //   required List<String> vehicleImageUrls,
-  // }) async {
-  //   final DatabaseReference ref = FirebaseDatabase.instance.ref('drivers').push();
-  //   await ref.set({
-  //     'name': name,
-  //     'phoneNumber': phoneNumber,
-  //     'email': email,
-  //     'address': address,
-  //     'rcNumber': rcNumber,
-  //     'vehicleType': vehicleType,
-  //     'rcBookImageUrl': rcBookImageUrl,
-  //     'vehicleImageUrls': vehicleImageUrls,
-  //   });
-  // }
+// Future<void> saveFormData({
+//   required String name,
+//   required String phoneNumber,
+//   required String email,
+//   required String address,
+//   required String rcNumber,
+//   required String vehicleType,
+//   required String rcBookImageUrl,
+//   required List<String> vehicleImageUrls,
+// }) async {
+//   final DatabaseReference ref = FirebaseDatabase.instance.ref('drivers').push();
+//   await ref.set({
+//     'name': name,
+//     'phoneNumber': phoneNumber,
+//     'email': email,
+//     'address': address,
+//     'rcNumber': rcNumber,
+//     'vehicleType': vehicleType,
+//     'rcBookImageUrl': rcBookImageUrl,
+//     'vehicleImageUrls': vehicleImageUrls,
+//   });
+// }
 }

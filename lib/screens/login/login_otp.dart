@@ -35,11 +35,11 @@ class _LoginOtpState extends State<LoginOtp> {
         await authController.checkUserDataExists(widget.phoneNumber.trim());
     if (userDataExists) {
       // User data exists, navigate to OTP screen
-      // Get.offAll(() => HomeView());
+      Get.offAll(() => HomeView());
       print("Exist");
     } else {
       // User data doesn't exist, navigate to login form
-      // Get.offAll(() => LoginForm(widget.phoneNumber));
+      Get.to(() => LoginForm(widget.phoneNumber));
       print("Not Exist");
     }
   }

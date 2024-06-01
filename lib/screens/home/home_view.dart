@@ -1,4 +1,3 @@
-
 import 'package:easy_go_partner/screens/profile/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -8,7 +7,6 @@ import '../booking/bookings.dart';
 import '../wallet/wallet.dart';
 import 'home_screen.dart';
 
-
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
 
@@ -17,8 +15,10 @@ class HomeView extends StatelessWidget {
     var controller = Get.put(HomeController());
 
     var navbarItem = [
-      const BottomNavigationBarItem(icon: Icon(Icons.request_page), label: "Request"),
-      const BottomNavigationBarItem(icon: Icon(Icons.history), label: "Bookings"),
+      const BottomNavigationBarItem(
+          icon: Icon(Icons.request_page), label: "Request"),
+      const BottomNavigationBarItem(
+          icon: Icon(Icons.history), label: "Bookings"),
       const BottomNavigationBarItem(
           icon: Icon(Icons.account_balance_wallet_sharp), label: "Wallet"),
       const BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
@@ -35,14 +35,14 @@ class HomeView extends StatelessWidget {
       body: Column(
         children: [
           Obx(
-                () => Expanded(
+            () => Expanded(
               child: navBody.elementAt(controller.currentNavIndex.value),
             ),
           ),
         ],
       ),
       bottomNavigationBar: Obx(
-            () => BottomNavigationBar(
+        () => BottomNavigationBar(
           // elevation: 0.5,
           currentIndex: controller.currentNavIndex.value,
           selectedItemColor: Colors.black87,

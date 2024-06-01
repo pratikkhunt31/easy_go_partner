@@ -29,6 +29,7 @@ class AuthController extends GetxController {
           log('Completed');
           userCredential = credential as UserCredential?;
           await auth.signInWithCredential(credential);
+          currentUser = auth.currentUser;
         },
         forceResendingToken: resendTokenId,
         verificationFailed: (FirebaseAuthException e) {
@@ -55,6 +56,8 @@ class AuthController extends GetxController {
       PhoneAuthCredential credential = PhoneAuthProvider.credential(
           verificationId: verId, smsCode: otpNumber);
       await auth.signInWithCredential(credential);
+      currentUser = auth.currentUser;
+
     } catch (e) {
       rethrow;
     }

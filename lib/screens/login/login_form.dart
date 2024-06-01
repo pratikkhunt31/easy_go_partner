@@ -2,6 +2,8 @@ import 'dart:io';
 import 'dart:async';
 import 'package:easy_go_partner/controller/driver_controller.dart';
 import 'package:easy_go_partner/screens/home/home_view.dart';
+import 'package:easy_go_partner/screens/login/bank_details.dart';
+import 'package:easy_go_partner/screens/login/otp_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -9,17 +11,16 @@ import '../../controller/auth_controller.dart';
 import '../../widget/custom_widget.dart';
 
 class LoginForm extends StatefulWidget {
-  // final String countryCode;
+  final String countryCode;
   final String phoneNumber;
 
-  const LoginForm(this.phoneNumber, {super.key});
+  const LoginForm(this.countryCode, this.phoneNumber, {super.key});
 
   @override
   State<LoginForm> createState() => _LoginFormState();
 }
 
 class _LoginFormState extends State<LoginForm> {
-
   AuthController authController = Get.put(AuthController());
   DriverController driverController = Get.put(DriverController());
 
@@ -37,21 +38,21 @@ class _LoginFormState extends State<LoginForm> {
     } else if (driverController.rcNumController.text.isEmpty) {
       authController.validSnackBar("RC-Number is not empty");
     } else if (driverController.rcBookImg == null) {
-      authController.validSnackBar("RC book images is not empty");
+      authController.validSnackBar("Upload RC book image");
     } else if (driverController.vNumController.text.isEmpty) {
       authController.validSnackBar("Vehicle Number is not empty");
     } else if (driverController.vehicleImages.length < 2) {
-      authController.validSnackBar("Vehicle images is not empty");
+      authController.validSnackBar("Upload vehicle images image");
     } else if (driverController.dLController.text.isEmpty) {
       authController.validSnackBar("DL-Number is not empty");
     } else if (driverController.licenseImg == null) {
-      authController.validSnackBar("License images is not empty");
+      authController.validSnackBar("Upload License image");
     } else {
-      registerDriver();
+      routePage();
     }
   }
 
-  registerDriver() async {
+  routePage() async {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -59,18 +60,10 @@ class _LoginFormState extends State<LoginForm> {
         return ProgressDialog(message: "Processing, Please wait...");
       },
     );
-    await driverController.registerUser(widget.phoneNumber);
+    // await driverController.registerUser(widget.phoneNumber);
     await Future.delayed(Duration());
     Navigator.pop(context);
-    await Get.offAll(()=> HomeView());
-    // Get.to(() => OtpScreen( widget.countryCode + widget.phoneNumber));
-    // await Get.to(
-    //   () => OtpScreen(
-    //     widget.countryCode + widget.phoneNumber,
-    //     driverController.nameController.text.trim(),
-    //     driverController.emailController.text.trim(),
-    //   ),
-    // );
+    await Get.to(() => BankDetails(widget.countryCode, widget.phoneNumber));
   }
 
   Future<void> getImage(ImageSource source, Function(File) onSelected) async {
@@ -78,7 +71,6 @@ class _LoginFormState extends State<LoginForm> {
       final pickedImage =
           await driverController.picker.pickImage(source: source);
       if (pickedImage == null) return;
-
       setState(() {
         onSelected(File(pickedImage.path));
       });
@@ -190,22 +182,58 @@ class _LoginFormState extends State<LoginForm> {
             ),
             const SizedBox(height: 20),
             formField(
-                controller: driverController.nameController,
-                "Enter Your Name",
-                Icons.person_outline_sharp),
-            const SizedBox(height: 20),
-            formField("Mobile", Icons.phone,
-                sufIcon: Icons.edit, read: true, hint: widget.phoneNumber),
+              controller: driverController.nameController,
+              "Enter Your Name",
+              Icons.person_outline_sharp,
+            ),
             const SizedBox(height: 20),
             formField(
-                controller: driverController.emailController,
-                "Email",
-                Icons.email_outlined),
+              "Mobile",
+              Icons.phone,
+              sufIcon: Icons.edit,
+              read: true,
+              hint: widget.phoneNumber,
+            ),
             const SizedBox(height: 20),
             formField(
-                controller: driverController.addressController,
-                "Address",
-                Icons.home_outlined),
+              controller: driverController.emailController,
+              "Email",
+              Icons.email_outlined,
+            ),
+            const SizedBox(height: 20),
+            formField(
+              controller: driverController.addressController,
+              "Address",
+              Icons.home_outlined,
+            ),
+            const SizedBox(height: 20),
+            formField(
+              controller: driverController.cityController,
+              "City",
+              Icons.location_city_outlined,
+            ),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Expanded(
+                  child: formField(
+                    controller: driverController.stateController,
+                    "State",
+                    Icons.map_outlined,
+                  ),
+                ),
+                SizedBox(width: 5),
+                Expanded(
+                  child: formField(
+                    controller: driverController.pinCodeController,
+                    "Pin Code",
+                    Icons.pin_drop_outlined,
+                    isNum: true,
+                  ),
+                ),
+              ],
+            ),
             const SizedBox(height: 20),
             ValueListenableBuilder<String?>(
               valueListenable: driverController.selectedVehicleNotifier,
@@ -234,9 +262,10 @@ class _LoginFormState extends State<LoginForm> {
             ),
             const SizedBox(height: 20),
             formField(
-                controller: driverController.rcNumController,
-                "RC-Number",
-                Icons.numbers),
+              controller: driverController.rcNumController,
+              "RC-Number",
+              Icons.numbers,
+            ),
             const SizedBox(height: 20),
             OutlinedButton.icon(
               onPressed: () => showImagePickerOptions(
@@ -289,9 +318,10 @@ class _LoginFormState extends State<LoginForm> {
                 : Container(),
             const SizedBox(height: 20),
             formField(
-                controller: driverController.vNumController,
-                "Vehicle-Number",
-                Icons.numbers),
+              controller: driverController.vNumController,
+              "Vehicle-Number",
+              Icons.numbers,
+            ),
             const SizedBox(height: 20),
             OutlinedButton.icon(
               onPressed: showMultipleImagePickerOptions,
@@ -359,9 +389,10 @@ class _LoginFormState extends State<LoginForm> {
                 : Container(),
             const SizedBox(height: 10),
             formField(
-                controller: driverController.dLController,
-                "Driving License",
-                Icons.directions_bike_sharp),
+              controller: driverController.dLController,
+              "Driving License",
+              Icons.directions_bike_sharp,
+            ),
             const SizedBox(height: 20),
             OutlinedButton.icon(
               onPressed: () => showImagePickerOptions((file) {
@@ -394,7 +425,7 @@ class _LoginFormState extends State<LoginForm> {
                         child: Image.file(
                           driverController.licenseImg!,
                           height: 150,
-                          fit: BoxFit.fill,
+                          fit: BoxFit.cover,
                         ),
                       ),
                       const SizedBox(height: 10),
@@ -413,7 +444,7 @@ class _LoginFormState extends State<LoginForm> {
                     ],
                   )
                 : Container(),
-            // const SizedBox(height: 20),
+            const SizedBox(height: 10),
             SizedBox(
               width: double.infinity,
               child: CustomButton(

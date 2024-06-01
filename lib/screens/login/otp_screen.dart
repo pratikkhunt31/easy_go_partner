@@ -4,16 +4,13 @@ import 'package:get/get.dart';
 import 'package:pinput/pinput.dart';
 
 import '../../controller/auth_controller.dart';
+import '../../controller/driver_controller.dart';
 import '../../widget/custom_widget.dart';
 import '../home/home_view.dart';
 
 class OtpScreen extends StatefulWidget {
   final String phoneNumber;
-  // final String? name;
-  // final String? email;
 
-  // const OtpScreen(this.phoneNumber, this.name, this.email, {Key? key})
-  //     : super(key: key);
   const OtpScreen(this.phoneNumber, {Key? key})
       : super(key: key);
 
@@ -25,6 +22,8 @@ class _OtpScreenState extends State<OtpScreen> {
   String? otpCode;
   TextEditingController otpController = TextEditingController();
   AuthController authController = Get.put(AuthController());
+  DriverController driverController = Get.put(DriverController());
+
 
   @override
   void initState() {
@@ -35,7 +34,6 @@ class _OtpScreenState extends State<OtpScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print(widget.phoneNumber);
 
     final Size screenSize = MediaQuery.of(context).size;
     final double screenHeight = screenSize.height;
@@ -135,10 +133,9 @@ class _OtpScreenState extends State<OtpScreen> {
                           ? () async {
                               try {
                                 await authController.verifyOtp(otpCode!);
-                                // await authController.saveUserInfo(widget.name!, widget.email!, widget.phoneNumber);
-                                // authController.successSnackBar(
-                                //     "OTP verified successfully");
-                                Get.off(() =>  HomeView());
+                                await driverController.registerUser(widget.phoneNumber);
+                                Get.offAll(() =>  HomeView());
+
                               } catch (e) {
                                 // If verification fails, show error message
                                 authController.error("Error verifying OTP", e);

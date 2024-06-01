@@ -30,19 +30,6 @@ class _LoginOtpState extends State<LoginOtp> {
     // print("+${selectedCountry.phoneCode + widget..text.trim()}");
   }
 
-  void checkUserDataAndNavigate() async {
-    bool userDataExists =
-        await authController.checkUserDataExists(widget.phoneNumber.trim());
-    if (userDataExists) {
-      // User data exists, navigate to OTP screen
-      Get.offAll(() => HomeView());
-      print("Exist");
-    } else {
-      // User data doesn't exist, navigate to login form
-      Get.to(() => LoginForm(widget.phoneNumber));
-      print("Not Exist");
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -79,7 +66,7 @@ class _LoginOtpState extends State<LoginOtp> {
                     height: screenHeight * 0.3,
                     // 30% of screen height for image
                     child: Image.asset(
-                      'assets/images/number.jpg',
+                      'assets/images/otp.png',
                       fit: BoxFit.contain,
                     ),
                   ),
@@ -142,17 +129,13 @@ class _LoginOtpState extends State<LoginOtp> {
                       borderRadius: BorderRadius.circular(25.0),
                       onPress: otpCode.toString().length.isEqual(6)
                           ? () async {
-                              // showProgressDialog(context);
                               try {
                                 await authController.verifyOtp(otpCode!);
-                                // await authController.saveUserInfo(widget.name!, widget.email!, widget.phoneNumber);
-                                // hideProgressDialog(context);
                                 authController.successSnackBar(
                                     "OTP verified successfully");
-                                checkUserDataAndNavigate();
+                                Get.offAll(() =>  HomeView());
                               } catch (e) {
-                                // hideProgressDialog(context);
-                                // If verification fails, show error message
+
                                 authController.error("Error verifying OTP", e);
                               }
                             }

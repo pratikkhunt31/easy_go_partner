@@ -1,4 +1,3 @@
-
 import 'package:easy_loading_button/easy_loading_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,63 +7,46 @@ import 'package:ionicons/ionicons.dart';
 
 import '../screens/login/num_screen.dart';
 
-class CustomButton extends StatelessWidget {
-  final String? hint;
-  final Function onPress;
-  final Color? color;
-  final BorderRadius borderRadius;
+Widget CustomButton({
+  required String hint,
+  required Function onPress,
+  Color? color,
+  required BorderRadius borderRadius,
+}) {
+  const buttonHeight =
+      50.0; // You can adjust the height according to your preference
+  const fontSize =
+      buttonHeight * 0.38; // Adjust font size relative to button height
 
-  const CustomButton(
-      {super.key,
-      required this.hint,
-      required this.onPress,
-      this.color,
-      required this.borderRadius});
-
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints constraints) {
-        final buttonWidth =
-            constraints.maxWidth * 0.8; // Adjust the width as needed
-        const buttonHeight =
-            50.0; // You can adjust the height according to your preference
-        const fontSize =
-            buttonHeight * 0.38; // Adjust font size relative to button height
-
-        return SizedBox(
-          height: buttonHeight,
-          width: buttonWidth,
-          child: ClipRRect(
-            borderRadius: borderRadius,
-            child: EasyButton(
-              type: EasyButtonType.elevated,
-              onPressed: onPress as void Function()?,
-              buttonColor: const Color(0xFF0000FF),
-              idleStateWidget: Text(
-                hint!,
-                style: const TextStyle(
-                  fontSize: fontSize,
-                ),
-              ),
-              loadingStateWidget: const CircularProgressIndicator(
-                strokeWidth: 2.5,
-                valueColor: AlwaysStoppedAnimation<Color>(
-                  Colors.white,
-                ),
-              ),
-              useWidthAnimation: false,
-              useEqualLoadingStateWidgetDimension: true,
-              // width: 150,
-              height: 38,
-              elevation: 0.0,
-              contentGap: 5.1,
-            ),
+  return SizedBox(
+    height: buttonHeight,
+    width: double.infinity,
+    child: ClipRRect(
+      borderRadius: borderRadius,
+      child: EasyButton(
+        type: EasyButtonType.elevated,
+        onPressed: onPress as void Function()?,
+        buttonColor: color ?? const Color(0xFF0000FF),
+        idleStateWidget: Text(
+          hint,
+          style: TextStyle(
+            fontSize: fontSize,
           ),
-        );
-      },
-    );
-  }
+        ),
+        loadingStateWidget: const CircularProgressIndicator(
+          strokeWidth: 2.5,
+          valueColor: AlwaysStoppedAnimation<Color>(
+            Colors.white,
+          ),
+        ),
+        useWidthAnimation: false,
+        useEqualLoadingStateWidgetDimension: true,
+        height: 45,
+        elevation: 0.0,
+        contentGap: 5.1,
+      ),
+    ),
+  );
 }
 
 class VehicleCard extends StatelessWidget {
@@ -77,7 +59,8 @@ class VehicleCard extends StatelessWidget {
     super.key,
     required this.vName,
     required this.image,
-    required this.onPress, required this.height,
+    required this.onPress,
+    required this.height,
   });
 
   @override
@@ -153,13 +136,19 @@ class VehicleCard extends StatelessWidget {
 TextFormField formField(String fieldName, IconData icon,
     {TextEditingController? controller,
     IconData? sufIcon,
+    bool obscure = false,
+    bool capital = false,
+    bool isNum = false,
     bool? read = false,
     String? hint}) {
   return TextFormField(
     initialValue: hint,
     controller: controller,
     cursorColor: Colors.black,
-    textCapitalization: TextCapitalization.sentences,
+    obscureText: obscure,
+    keyboardType: isNum ? TextInputType.number : TextInputType.text,
+    textCapitalization:
+        capital ? TextCapitalization.characters : TextCapitalization.sentences,
     // inputFormatters: [
     //   FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9 @.-]')),
     // ],

@@ -95,6 +95,8 @@ flutter:
   assets:
     - assets/
     - assets/images/
+    - assets/images/number.png
+    - assets/images/otp.png
     - assets/images/splash.gif
 
   # An image asset can refer to one or more resolution-specific "variants", see

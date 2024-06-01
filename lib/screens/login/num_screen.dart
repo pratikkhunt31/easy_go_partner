@@ -32,6 +32,20 @@ class _NumberScreenState extends State<NumberScreen> {
     e164Key: "",
   );
 
+  void checkUserDataAndNavigate() async {
+    bool userDataExists = await authController.checkUserDataExists(
+        "+${selectedCountry.phoneCode + phoneController.text.trim()}");
+    if (userDataExists) {
+      // User data exists, navigate to OTP screen
+      Get.to(() => LoginOtp(
+          "+${selectedCountry.phoneCode}" + phoneController.text.trim()));
+    } else {
+      // User data doesn't exist, navigate to login form
+      Get.to(() => LoginForm(
+          "+${selectedCountry.phoneCode}", phoneController.text.trim()));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     phoneController.selection = TextSelection.fromPosition(
@@ -60,7 +74,7 @@ class _NumberScreenState extends State<NumberScreen> {
                         height: constraints.maxHeight * 0.4,
                         width: constraints.maxWidth * 0.8,
                         child: Image.asset(
-                          'assets/images/number.jpg',
+                          'assets/images/number.png',
                           fit: BoxFit.contain,
                         ),
                       ),
@@ -178,7 +192,7 @@ class _NumberScreenState extends State<NumberScreen> {
                               ? () async {
                                   try {
                                     await Future.delayed(
-                                        const Duration(seconds: 2));
+                                        const Duration(seconds: 5));
                                     // if (!authController.isValidPhoneNumber(
                                     //     phoneController.text)) {
                                     //   // Show an error Snack bar if the phone number is invalid
@@ -190,9 +204,10 @@ class _NumberScreenState extends State<NumberScreen> {
 
                                     // print(
                                     //     "+${selectedCountry.phoneCode + phoneController.text.trim()}");
-                                    Get.to(() => LoginOtp(
-                                        "+${selectedCountry.phoneCode}" +
-                                            phoneController.text.trim()));
+                                    checkUserDataAndNavigate();
+                                    // Get.to(() => LoginOtp(
+                                    //     "+${selectedCountry.phoneCode}" +
+                                    //         phoneController.text.trim()));
                                   } catch (e) {
                                     authController.validSnackBar(
                                         "Error validating phone number: $e");

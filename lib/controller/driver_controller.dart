@@ -11,17 +11,24 @@ import '../consts/firebase_consts.dart';
 
 class DriverController extends GetxController {
   ValueNotifier<String?> selectedVehicleNotifier = ValueNotifier<String?>(null);
-
   TextEditingController nameController = TextEditingController();
-
   // TextEditingController numController = TextEditingController();
   TextEditingController emailController = TextEditingController();
+  TextEditingController bNameController = TextEditingController();
+  TextEditingController accNumController = TextEditingController();
+  TextEditingController cAccNumController = TextEditingController();
+  TextEditingController ifscController = TextEditingController();
+  TextEditingController panController = TextEditingController();
   TextEditingController addressController = TextEditingController();
+  TextEditingController cityController = TextEditingController();
+  TextEditingController stateController = TextEditingController();
+  TextEditingController pinCodeController = TextEditingController();
   TextEditingController rcNumController = TextEditingController();
   TextEditingController vNumController = TextEditingController();
   TextEditingController dLController = TextEditingController();
 
   File? rcBookImg;
+  File? passBookImg;
   List<File> vehicleImages = [];
   File? licenseImg;
   final picker = ImagePicker();
@@ -40,6 +47,7 @@ class DriverController extends GetxController {
     try {
       String rcBookImageUrl = '';
       String licenseImageUrl = '';
+      String passBookImageUrl = '';
       List<String> vehicleImageUrls = [];
 
       if (rcBookImg != null) {
@@ -50,32 +58,70 @@ class DriverController extends GetxController {
         licenseImageUrl = await uploadFile(licenseImg!);
       }
 
+      if (passBookImg != null) {
+        passBookImageUrl = await uploadFile(passBookImg!);
+      }
+
       for (File image in vehicleImages) {
         vehicleImageUrls.add(await uploadFile(image));
       }
 
-      Map<String, dynamic> userData = {
-        'name': nameController.text,
-        'phoneNumber': phoneNumber,
-        'email': emailController.text,
-        'address': addressController.text,
-        'rcNumber': rcNumController.text,
+      Map<String, dynamic> driverData = {
+        'name': nameController.text.trim(),
+        'phoneNumber': phoneNumber.trim(),
+        'email': emailController.text.trim(),
+        'street': addressController.text.trim(),
+        'city': cityController.text.trim(),
+        'state': stateController.text.trim(),
+        'postal_code': pinCodeController.text.trim(),
+        'country': "IN",
+        'PAN_number': panController.text.trim(),
+        'bank_name': bNameController.text.trim(),
+        'acc_number': accNumController.text.trim(),
+        'confirm_accNumber': cAccNumController.text.trim(),
+        'IFSC_code': ifscController.text.trim(),
+        'rcNumber': rcNumController.text.trim(),
         'vehicleType': selectedVehicleNotifier.value,
         'is_verified': false,
         'is_online': true,
         'd_id': currentUser!.uid,
+        'passBookImage': passBookImageUrl,
         'rcBookImage': rcBookImageUrl,
         'vehicleImages': vehicleImageUrls,
         'licenseImage': licenseImageUrl,
       };
 
       DatabaseReference database = FirebaseDatabase.instance.ref();
-      await database.child('drivers').child(currentUser!.uid).set(userData);
+      await database.child('drivers').child(currentUser!.uid).set(driverData);
 
       successSnackBar("User registered successfully!");
+      clearControllers();
+
     } catch (e) {
       error("Error registering user", e);
     }
+  }
+
+  void clearControllers() {
+    nameController.clear();
+    emailController.clear();
+    bNameController.clear();
+    accNumController.clear();
+    cAccNumController.clear();
+    ifscController.clear();
+    panController.clear();
+    addressController.clear();
+    cityController.clear();
+    stateController.clear();
+    pinCodeController.clear();
+    rcNumController.clear();
+    vNumController.clear();
+    dLController.clear();
+    selectedVehicleNotifier.value = null;
+    rcBookImg = null;
+    passBookImg = null;
+    vehicleImages.clear();
+    licenseImg = null;
   }
 
   void getRideRequests() async {

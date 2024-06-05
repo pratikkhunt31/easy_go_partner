@@ -43,7 +43,7 @@ class DriverController extends GetxController {
     return await taskSnapshot.ref.getDownloadURL();
   }
 
-  Future<void> registerUser(String phoneNumber) async {
+  Future<void> registerUser(String phoneNumber, String accountId) async {
     try {
       String rcBookImageUrl = '';
       String licenseImageUrl = '';
@@ -67,6 +67,7 @@ class DriverController extends GetxController {
       }
 
       Map<String, dynamic> driverData = {
+        'account_id': accountId,
         'name': nameController.text.trim(),
         'phoneNumber': phoneNumber.trim(),
         'email': emailController.text.trim(),

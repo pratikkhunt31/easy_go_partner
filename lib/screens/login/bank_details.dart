@@ -47,8 +47,8 @@ class _BankDetailsState extends State<BankDetails> {
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
         final accountId = responseData['account_id'];
-        await storeAccountIdInFirebase(accountId);
-        routePage();
+        // await storeAccountIdInFirebase(accountId);
+        routePage(accountId);
       } else {
         authController
             .validSnackBar("Failed to create account: ${response.body}");
@@ -92,7 +92,7 @@ class _BankDetailsState extends State<BankDetails> {
     }
   }
 
-  void routePage() async {
+  void routePage(String accountId) async {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -102,7 +102,7 @@ class _BankDetailsState extends State<BankDetails> {
     );
     await Future.delayed(Duration(seconds: 2));
     Navigator.pop(context);
-    await Get.to(() => OtpScreen(widget.countryCode + widget.phoneNumber));
+    await Get.to(() => OtpScreen(widget.countryCode + widget.phoneNumber, accountId));
   }
 
   Future<void> getImage(ImageSource source, Function(File) onSelected) async {

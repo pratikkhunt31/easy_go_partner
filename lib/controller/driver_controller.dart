@@ -124,7 +124,65 @@ class DriverController extends GetxController {
     licenseImg = null;
   }
 
-  void getRideRequests() async {
+  var rideRequests = [].obs;
+
+  void getRideRequests(String vehicleType) {
+    DatabaseReference rideRequestsRef = FirebaseDatabase.instance.ref().child('Ride Request');
+    rideRequestsRef.once().then((DatabaseEvent event) {
+      if (event.snapshot.value != null) {
+        // Using Map<dynamic, dynamic> to handle potential type issues
+        Map<dynamic, dynamic> allRideRequests = event.snapshot.value as Map<dynamic, dynamic>;
+
+        var filteredRequests = allRideRequests.entries.where((entry) {
+          // Ensuring that the value is of type Map
+          if (entry.value is Map) {
+            var rideRequest = Map<String, dynamic>.from(entry.value);
+            return rideRequest['v_type'] == vehicleType && rideRequest['driver_id'] == 'waiting';
+          }
+          return false;
+        }).map((entry) {
+          var rideRequest = Map<String, dynamic>.from(entry.value);
+          rideRequest['rideRequestId'] = entry.key;
+          return rideRequest;
+        }).toList();
+
+        rideRequests.value = filteredRequests;
+      }
+    }).catchError((error) {
+      print("Failed to load ride requests: $error");
+    });
+  }
+
+  void startListeningForRideRequests(String driverId) {
+    DatabaseReference driverRef =
+    FirebaseDatabase.instance.ref().child('drivers').child(driverId).child('newRideRequests');
+
+    driverRef.onChildAdded.listen((event) {
+      String rideRequestId = event.snapshot.key!;
+      // Handle the new ride request here
+      fetchRideRequestDetails(rideRequestId);
+    });
+  }
+
+  void fetchRideRequestDetails(String rideRequestId) {
+    DatabaseReference rideRequestRef =
+    FirebaseDatabase.instance.ref().child('Ride Request').child(rideRequestId);
+
+    rideRequestRef.once().then((DatabaseEvent event) {
+      Map<String, dynamic> rideRequestData =
+      Map<String, dynamic>.from(event.snapshot.value as Map);
+      // Process the ride request data
+      displayRideRequestToDriver(rideRequestData);
+    });
+  }
+
+  void displayRideRequestToDriver(Map<String, dynamic> rideRequestData) {
+    // Show a notification or update the UI with the ride request details
+    print("New ride request received: $rideRequestData");
+    // Here you can navigate to a screen or show a dialog with ride request details
+  }
+
+  void getRideRequests2() async {
     DatabaseReference rideRequestRef =
         FirebaseDatabase.instance.ref().child("Ride Request");
 
@@ -140,7 +198,7 @@ class DriverController extends GetxController {
           if (value is Map) {
             Map<String, dynamic> rideInfoMap = Map<String, dynamic>.from(value);
 
-            if (rideInfoMap['v_type'] == 'Tempo' &&
+            if (rideInfoMap['v_type'] == 'tempo' &&
                 rideInfoMap['is_online'] == true) {
               print("Ride Request ID: $key");
               print("Driver ID: ${rideInfoMap['driver_id']}");

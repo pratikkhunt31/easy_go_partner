@@ -27,11 +27,13 @@ class _LoginFormState extends State<LoginForm> {
   validate() async {
     if (driverController.nameController.text.isEmpty) {
       authController.validSnackBar("Name is not empty");
-    } else if (driverController.emailController.text.isEmpty) {
-      authController.validSnackBar("Email Address is not empty");
-    } else if (!driverController.emailController.text.contains("@gmail.com")) {
-      authController.validSnackBar("Email Address is not valid");
-    } else if (driverController.addressController.text.isEmpty) {
+    }
+    //  else if (driverController.emailController.text.isEmpty) {
+    //   authController.validSnackBar("Email Address is not empty");
+    // } else if (!driverController.emailController.text.contains("@gmail.com")) {
+    //   authController.validSnackBar("Email Address is not valid");
+    // } 
+    else if (driverController.addressController.text.isEmpty) {
       authController.validSnackBar("Address is not empty");
     } else if (driverController.selectedVehicleNotifier.value == null) {
       authController.validSnackBar("Vehicle-type is not empty");
@@ -194,12 +196,12 @@ class _LoginFormState extends State<LoginForm> {
               read: true,
               hint: widget.phoneNumber,
             ),
-            const SizedBox(height: 20),
-            formField(
-              controller: driverController.emailController,
-              "Email",
-              Icons.email_outlined,
-            ),
+            // const SizedBox(height: 20),
+            // formField(
+            //   controller: driverController.emailController,
+            //   "Email",
+            //   Icons.email_outlined,
+            // ),
             const SizedBox(height: 20),
             formField(
               controller: driverController.addressController,

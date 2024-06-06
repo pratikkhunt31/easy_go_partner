@@ -10,8 +10,9 @@ import '../home/home_view.dart';
 
 class OtpScreen extends StatefulWidget {
   final String phoneNumber;
+  final String accountId;
 
-  const OtpScreen(this.phoneNumber, {Key? key})
+  const OtpScreen(this.phoneNumber,this.accountId, {Key? key})
       : super(key: key);
 
   @override
@@ -133,7 +134,7 @@ class _OtpScreenState extends State<OtpScreen> {
                           ? () async {
                               try {
                                 await authController.verifyOtp(otpCode!);
-                                await driverController.registerUser(widget.phoneNumber);
+                                await driverController.registerUser(widget.phoneNumber, widget.accountId);
                                 Get.offAll(() =>  HomeView());
 
                               } catch (e) {

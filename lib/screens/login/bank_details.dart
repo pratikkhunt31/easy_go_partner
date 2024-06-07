@@ -176,7 +176,7 @@ class _BankDetailsState extends State<BankDetails> {
             const SizedBox(height: 20),
             formField(
               controller: driverController.bNameController,
-              "Enter Your Bank Name",
+              "Enter Your Name At Your Bank",
               Icons.account_balance_outlined,
             ),
             const SizedBox(height: 20),

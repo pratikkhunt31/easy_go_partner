@@ -194,15 +194,15 @@ class _NumberScreenState extends State<NumberScreen> {
                                     try {
                                       await Future.delayed(
                                           const Duration(seconds: 5));
-                                      // if (!authController.isValidPhoneNumber(
-                                      //     phoneController.text)) {
-                                      //   // Show an error Snack bar if the phone number is invalid
-                                      //   authController.errorSnackBarNew(
-                                      //       "Invalid phone number. Please enter a valid 10-digit number.");
-                                      //   return;
-                                      // }
+                                      if (!authController.isValidPhoneNumber(
+                                          phoneController.text)) {
+                                        // Show an error Snack bar if the phone number is invalid
+                                        authController.validSnackBar(
+                                            "Invalid phone number. Please enter a valid 10-digit number.");
+                                        return;
+                                      }
                                       // Proceed with login
-                    
+
                                       // print(
                                       //     "+${selectedCountry.phoneCode + phoneController.text.trim()}");
                                       checkUserDataAndNavigate();

@@ -36,21 +36,19 @@ class _LoginFormState extends State<LoginForm> {
       authController.validSnackBar("Address is not empty");
     } else if (driverController.selectedVehicleNotifier.value == null) {
       authController.validSnackBar("Vehicle-type is not empty");
-    }
-    // else if (driverController.rcNumController.text.isEmpty) {
-    //   authController.validSnackBar("RC-Number is not empty");
-    // } else if (driverController.rcBookImg == null) {
-    //   authController.validSnackBar("Upload RC book image");
-    // } else if (driverController.vNumController.text.isEmpty) {
-    //   authController.validSnackBar("Vehicle Number is not empty");
-    // } else if (driverController.vehicleImages.length < 2) {
-    //   authController.validSnackBar("Upload vehicle images image");
-    // } else if (driverController.dLController.text.isEmpty) {
-    //   authController.validSnackBar("DL-Number is not empty");
-    // } else if (driverController.licenseImg == null) {
-    //   authController.validSnackBar("Upload License image");
-    // }
-    else {
+    } else if (driverController.rcNumController.text.isEmpty) {
+      authController.validSnackBar("RC-Number is not empty");
+    } else if (driverController.rcBookImg == null) {
+      authController.validSnackBar("Upload RC book image");
+    } else if (driverController.vNumController.text.isEmpty) {
+      authController.validSnackBar("Vehicle Number is not empty");
+    } else if (driverController.vehicleImages.length < 2) {
+      authController.validSnackBar("Upload vehicle images image");
+    } else if (driverController.dLController.text.isEmpty) {
+      authController.validSnackBar("DL-Number is not empty");
+    } else if (driverController.licenseImg == null) {
+      authController.validSnackBar("Upload License image");
+    } else {
       routePage();
     }
   }
@@ -164,7 +162,6 @@ class _LoginFormState extends State<LoginForm> {
 
   @override
   Widget build(BuildContext context) {
-
     // print("${widget.countryCode}${widget.phoneNumber}");
     final Size screenSize = MediaQuery.of(context).size;
     final double screenHeight = screenSize.height;

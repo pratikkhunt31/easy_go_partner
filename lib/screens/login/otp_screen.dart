@@ -133,7 +133,7 @@ class _OtpScreenState extends State<OtpScreen> {
                       onPress: otpCode.toString().length.isEqual(6)
                           ? () async {
                               try {
-                                Future.delayed(Duration(seconds: 5));
+                                Future.delayed(Duration(seconds: 6));
                                 await authController.verifyOtp(otpCode!);
                                 await driverController.registerUser(widget.phoneNumber, widget.accountId);
                                 Get.offAll(() =>  HomeView());

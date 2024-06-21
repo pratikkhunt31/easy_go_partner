@@ -220,14 +220,28 @@ class _HomeScreenState extends State<HomeScreen> {
       );
     }
     if (!isVerified) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.remove_red_eye_sharp, size: 50),
-            SizedBox(height: 10),
-            Text("Your application is under review"),
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text("Ride Request"),
+          backgroundColor: const Color(0xFF0000FF),
+          elevation: 0,
+          actions: [
+            Switch(
+              value: isOnline,
+              onChanged: (value) {},
+              activeColor: Colors.green,
+            ),
           ],
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.remove_red_eye_sharp, size: 50),
+              SizedBox(height: 10),
+              Text("Your application is under review"),
+            ],
+          ),
         ),
       );
     }

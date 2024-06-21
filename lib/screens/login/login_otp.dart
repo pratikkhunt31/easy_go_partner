@@ -131,7 +131,6 @@ class _LoginOtpState extends State<LoginOtp> {
                           ? () async {
                               try {
                                 await authController.verifyOtp(otpCode!);
-
                                 Get.offAll(() =>  HomeView());
                               } catch (e) {
 

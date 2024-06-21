@@ -16,7 +16,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyByM90kL-QTAHjvrg5YSNj3ELbDSGfMICo"
+          "current_key": "AIzaSyACC6c1MTl20ZgZ7AHQEIQJcW99FbOA7Xo"
         }
       ],
       "services": {
@@ -35,7 +35,26 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyByM90kL-QTAHjvrg5YSNj3ELbDSGfMICo"
+          "current_key": "AIzaSyACC6c1MTl20ZgZ7AHQEIQJcW99FbOA7Xo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:775114387205:android:5b0ea202542a2802a2d16c",
+        "android_client_info": {
+          "package_name": "com.easy_go_admin"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyACC6c1MTl20ZgZ7AHQEIQJcW99FbOA7Xo"
         }
       ],
       "services": {

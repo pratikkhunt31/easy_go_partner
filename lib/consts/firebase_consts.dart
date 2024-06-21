@@ -6,4 +6,4 @@ FirebaseAuth auth = FirebaseAuth.instance;
 FirebaseFirestore firestore = FirebaseFirestore.instance;
 User? currentUser = auth.currentUser;
 
-String mapKey = "AIzaSyAQ0NjNCu-wy3zevyKh2uOSrndRFHrxsN8";
+String mapKey = "AIzaSyAqipTSsRuhBpesZFWDHYY2muffFj0ziU0";

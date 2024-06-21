@@ -8,8 +8,10 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
 
 import '../consts/firebase_consts.dart';
+import '../screens/home/home_view.dart';
 
 class DriverController extends GetxController {
+
   ValueNotifier<String?> selectedVehicleNotifier = ValueNotifier<String?>(null);
   TextEditingController nameController = TextEditingController();
   // TextEditingController numController = TextEditingController();
@@ -45,58 +47,65 @@ class DriverController extends GetxController {
 
   Future<void> registerUser(String phoneNumber, String accountId) async {
     try {
-      String rcBookImageUrl = '';
-      String licenseImageUrl = '';
-      String passBookImageUrl = '';
-      List<String> vehicleImageUrls = [];
+      if (currentUser != null) {
+        String rcBookImageUrl = '';
+        String licenseImageUrl = '';
+        String passBookImageUrl = '';
+        List<String> vehicleImageUrls = [];
 
-      if (rcBookImg != null) {
-        rcBookImageUrl = await uploadFile(rcBookImg!);
+        if (rcBookImg != null) {
+          rcBookImageUrl = await uploadFile(rcBookImg!);
+        }
+
+        if (licenseImg != null) {
+          licenseImageUrl = await uploadFile(licenseImg!);
+        }
+
+        if (passBookImg != null) {
+          passBookImageUrl = await uploadFile(passBookImg!);
+        }
+
+        for (File image in vehicleImages) {
+          vehicleImageUrls.add(await uploadFile(image));
+        }
+
+        Map<String, dynamic> driverData = {
+          'account_id': accountId,
+          'name': nameController.text.trim(),
+          'phoneNumber': phoneNumber.trim(),
+          'email': emailController.text.trim(),
+          'street': addressController.text.trim(),
+          'city': cityController.text.trim(),
+          'state': stateController.text.trim(),
+          'postal_code': pinCodeController.text.trim(),
+          'country': "IN",
+          'PAN_number': panController.text.trim(),
+          'bank_name': bNameController.text.trim(),
+          'acc_number': accNumController.text.trim(),
+          'confirm_accNumber': cAccNumController.text.trim(),
+          'IFSC_code': ifscController.text.trim(),
+          'rcNumber': rcNumController.text.trim(),
+          'dl_number': dLController.text.trim(),
+          'vehicleType': selectedVehicleNotifier.value,
+          'is_verified': false,
+          'is_online': true,
+          'd_id': currentUser!.uid,
+          'passBookImage': passBookImageUrl,
+          'rcBookImage': rcBookImageUrl,
+          'vehicleImages': vehicleImageUrls,
+          'licenseImage': licenseImageUrl,
+        };
+
+        DatabaseReference database = FirebaseDatabase.instance.ref();
+        await database.child('drivers').child(currentUser!.uid).set(driverData);
+
+        successSnackBar("User registered successfully!");
+        clearControllers();
+
+      } else {
+        // Navigator.pop(context); // Close the dialog
+        validSnackBar("Account has not been created");
       }
-
-      if (licenseImg != null) {
-        licenseImageUrl = await uploadFile(licenseImg!);
-      }
-
-      if (passBookImg != null) {
-        passBookImageUrl = await uploadFile(passBookImg!);
-      }
-
-      for (File image in vehicleImages) {
-        vehicleImageUrls.add(await uploadFile(image));
-      }
-
-      Map<String, dynamic> driverData = {
-        'account_id': accountId,
-        'name': nameController.text.trim(),
-        'phoneNumber': phoneNumber.trim(),
-        'email': emailController.text.trim(),
-        'street': addressController.text.trim(),
-        'city': cityController.text.trim(),
-        'state': stateController.text.trim(),
-        'postal_code': pinCodeController.text.trim(),
-        'country': "IN",
-        'PAN_number': panController.text.trim(),
-        'bank_name': bNameController.text.trim(),
-        'acc_number': accNumController.text.trim(),
-        'confirm_accNumber': cAccNumController.text.trim(),
-        'IFSC_code': ifscController.text.trim(),
-        'rcNumber': rcNumController.text.trim(),
-        'vehicleType': selectedVehicleNotifier.value,
-        'is_verified': false,
-        'is_online': true,
-        'd_id': currentUser!.uid,
-        'passBookImage': passBookImageUrl,
-        'rcBookImage': rcBookImageUrl,
-        'vehicleImages': vehicleImageUrls,
-        'licenseImage': licenseImageUrl,
-      };
-
-      DatabaseReference database = FirebaseDatabase.instance.ref();
-      await database.child('drivers').child(currentUser!.uid).set(driverData);
-
-      successSnackBar("User registered successfully!");
-      clearControllers();
 
     } catch (e) {
       error("Error registering user", e);
@@ -118,7 +127,6 @@ class DriverController extends GetxController {
     rcNumController.clear();
     vNumController.clear();
     dLController.clear();
-    selectedVehicleNotifier.value = null;
     rcBookImg = null;
     passBookImg = null;
     vehicleImages.clear();
@@ -127,15 +135,13 @@ class DriverController extends GetxController {
 
   var rideRequests = [].obs;
 
-  void getRideRequests(String vehicleType) {
+  void getRideRequests(String? vehicleType) {
     DatabaseReference rideRequestsRef = FirebaseDatabase.instance.ref().child('Ride Request');
-    rideRequestsRef.once().then((DatabaseEvent event) {
+    rideRequestsRef.onValue.listen((DatabaseEvent event) {
       if (event.snapshot.value != null) {
-        // Using Map<dynamic, dynamic> to handle potential type issues
         Map<dynamic, dynamic> allRideRequests = event.snapshot.value as Map<dynamic, dynamic>;
 
         var filteredRequests = allRideRequests.entries.where((entry) {
-          // Ensuring that the value is of type Map
           if (entry.value is Map) {
             var rideRequest = Map<String, dynamic>.from(entry.value);
             return rideRequest['v_type'] == vehicleType && rideRequest['driver_id'] == 'waiting';
@@ -148,8 +154,10 @@ class DriverController extends GetxController {
         }).toList();
 
         rideRequests.value = filteredRequests;
+      } else {
+        rideRequests.clear();
       }
-    }).catchError((error) {
+    }).onError((error) {
       print("Failed to load ride requests: $error");
     });
   }
@@ -181,49 +189,6 @@ class DriverController extends GetxController {
     // Show a notification or update the UI with the ride request details
     print("New ride request received: $rideRequestData");
     // Here you can navigate to a screen or show a dialog with ride request details
-  }
-
-  void getRideRequests2() async {
-    DatabaseReference rideRequestRef =
-        FirebaseDatabase.instance.ref().child("Ride Request");
-
-    try {
-      DatabaseEvent event = await rideRequestRef.once();
-      DataSnapshot snapshot = event.snapshot;
-
-      if (snapshot.exists && snapshot.value is Map) {
-        Map<dynamic, dynamic> rideRequests =
-            snapshot.value as Map<dynamic, dynamic>;
-
-        rideRequests.forEach((key, value) {
-          if (value is Map) {
-            Map<String, dynamic> rideInfoMap = Map<String, dynamic>.from(value);
-
-            if (rideInfoMap['v_type'] == 'tempo' &&
-                rideInfoMap['is_online'] == true) {
-              print("Ride Request ID: $key");
-              print("Driver ID: ${rideInfoMap['driver_id']}");
-              print("Payment Status: ${rideInfoMap['payment_status']}");
-              print("Payout: ${rideInfoMap['payout']}");
-              print("Vehicle Type: ${rideInfoMap['v_type']}");
-              print("Pickup Location: ${rideInfoMap['pickUp']}");
-              print("Dropoff Location: ${rideInfoMap['dropOff']}");
-              print("Created At: ${rideInfoMap['created_at']}");
-              print("Rider Name: ${rideInfoMap['rider_name']}");
-              print("Rider Phone: ${rideInfoMap['rider_phone']}");
-              print("Pickup Address: ${rideInfoMap['pickUp_address']}");
-              print("Dropoff Address: ${rideInfoMap['dropOff_address']}");
-            }
-          } else {
-            print("Unexpected data format for ride request ID $key: $value");
-          }
-        });
-      } else {
-        print("No ride requests found or invalid data format.");
-      }
-    } catch (e) {
-      print("Failed to retrieve ride requests: $e");
-    }
   }
 
   void acceptRequest() async {

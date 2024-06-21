@@ -10,6 +10,7 @@ import 'package:http/http.dart' as http;
 
 import '../../controller/auth_controller.dart';
 import '../../controller/driver_controller.dart';
+import '../../model/address.dart';
 import '../../widget/custom_widget.dart';
 
 class BankDetails extends StatefulWidget {
@@ -25,51 +26,6 @@ class BankDetails extends StatefulWidget {
 class _BankDetailsState extends State<BankDetails> {
   AuthController authController = Get.put(AuthController());
   DriverController driverController = Get.put(DriverController());
-
-  Future<void> createAccount() async {
-    try {
-      final url =
-          Uri.parse('https://easygoapi-eieu6qudpq-uc.a.run.app/accounts');
-      final response = await http.post(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          "beneficiary_name": driverController.bNameController.text,
-          "email": driverController.emailController.text,
-          "bank_account_number": driverController.accNumController.text,
-          "ifsc_code": driverController.ifscController.text,
-        }),
-      );
-
-      log('Response status: ${response.statusCode}');
-      log('Response body: ${response.body}');
-
-      if (response.statusCode == 200) {
-        final responseData = jsonDecode(response.body);
-        final accountId = responseData['account_id'];
-        // await storeAccountIdInFirebase(accountId);
-        routePage(accountId);
-      } else {
-        authController
-            .validSnackBar("Failed to create account: ${response.body}");
-      }
-    } catch (e) {
-      authController.validSnackBar("An error occurred: $e");
-    }   
-  }
-
-  Future<void> storeAccountIdInFirebase(String accountId) async {
-    try {
-      final DatabaseReference database = FirebaseDatabase.instance.ref();
-      await database.child('drivers').update({
-        'account_id': accountId,
-      });
-      log('Data added to Realtime Database');
-    } catch (e) {
-      authController
-          .validSnackBar("Failed to store account ID in Firebase: $e");
-    }
-  }
 
   void validate() async {
     if (driverController.panController.text.isEmpty) {
@@ -92,17 +48,59 @@ class _BankDetailsState extends State<BankDetails> {
     }
   }
 
-  void routePage(String accountId) async {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext c) {
-        return ProgressDialog(message: "Processing, Please wait...");
-      },
-    );
-    await Future.delayed(Duration(seconds: 2));
-    Navigator.pop(context);
-    await Get.to(() => OtpScreen(widget.countryCode + widget.phoneNumber, accountId));
+  Future<void> createAccount() async {
+    try {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return ProgressDialog(message: "Processing, Please wait...");
+        },
+      );
+
+      final url =
+          Uri.parse('https://easygoapi-eieu6qudpq-uc.a.run.app/accounts');
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          "beneficiary_name": driverController.bNameController.text,
+          "email": driverController.emailController.text,
+          "bank_account_number": driverController.accNumController.text,
+          "ifsc_code": driverController.ifscController.text,
+        }),
+      );
+
+      Navigator.pop(context);
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        final accountId = responseData['account_id'];
+        log("message");
+        // await storeAccountIdInFirebase(accountId);
+        routePage(accountId);
+        await Get.to(() => OtpScreen(widget.countryCode + widget.phoneNumber, accountId));
+
+      } else {
+        authController
+            .validSnackBar("Failed to create account: ${response.body}");
+      }
+    } catch (e) {
+      Navigator.pop(context);
+      authController.validSnackBar("An error occurred: $e");
+    }
+  }
+
+  routePage(String accountId) async {
+    // showDialog(
+    //   context: context,
+    //   barrierDismissible: false,
+    //   builder: (BuildContext c) {
+    //     return ProgressDialog(message: "Processing, Please wait...");
+    //   },
+    // );
+    // await Future.delayed(Duration(seconds: 2));
+    // Navigator.pop(context);
   }
 
   Future<void> getImage(ImageSource source, Function(File) onSelected) async {
@@ -178,12 +176,6 @@ class _BankDetailsState extends State<BankDetails> {
               controller: driverController.bNameController,
               "Enter Your Bank Name",
               Icons.account_balance_outlined,
-            ),
-            const SizedBox(height: 20),
-            formField(
-              controller: driverController.emailController,
-              "Email",
-              Icons.email_outlined,
             ),
             const SizedBox(height: 20),
             formField(
@@ -269,8 +261,8 @@ class _BankDetailsState extends State<BankDetails> {
               width: double.infinity,
               child: CustomButton(
                 hint: "Continue",
-                onPress: () {
-                  log('button click');
+                onPress: () async{
+
                   validate();
                 },
                 borderRadius: BorderRadius.circular(25.0),

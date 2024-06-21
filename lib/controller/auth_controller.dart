@@ -7,7 +7,6 @@ import 'package:get/get.dart';
 import '../consts/firebase_consts.dart';
 
 class AuthController extends GetxController {
-
   String userUid = '';
   var verId = '';
   int? resendTokenId;
@@ -26,21 +25,19 @@ class AuthController extends GetxController {
         phoneNumber: phone,
         timeout: const Duration(seconds: 60),
         verificationCompleted: (PhoneAuthCredential credential) async {
-          log('Completed');
           userCredential = credential as UserCredential?;
           await auth.signInWithCredential(credential);
           currentUser = auth.currentUser;
         },
         forceResendingToken: resendTokenId,
         verificationFailed: (FirebaseAuthException e) {
-          log('Failed');
           if (e.code == 'Invalid phone number') {
             print("The phone is not valid");
           }
         },
         codeSent: (String verificationId, int? resendToken) async {
           otpSnackBar("OTP sent successfully");
-          log('Code sent');
+
           verId = verificationId;
           resendTokenId = resendToken;
         },
@@ -57,7 +54,7 @@ class AuthController extends GetxController {
           verificationId: verId, smsCode: otpNumber);
       await auth.signInWithCredential(credential);
       currentUser = auth.currentUser;
-
+      otpSnackBar("OTP verified successfully");
     } catch (e) {
       rethrow;
     }

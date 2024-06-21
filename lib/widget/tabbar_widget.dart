@@ -11,7 +11,7 @@ class TabBarWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return DefaultTabController(
       initialIndex: 0,
-      length: 3,
+      length: 2,
       child: Scaffold(
         appBar: AppBar(
           elevation: 0,
@@ -36,13 +36,13 @@ class TabBarWidget extends StatelessWidget {
                   style: TextStyle(fontSize: 18),
                 ),
               ),
-              Padding(
-                padding: EdgeInsets.only(bottom: 10.0),
-                child: Text(
-                  "Cancel",
-                  style: TextStyle(fontSize: 18),
-                ),
-              ),
+              // Padding(
+              //   padding: EdgeInsets.only(bottom: 10.0),
+              //   child: Text(
+              //     "Cancel",
+              //     style: TextStyle(fontSize: 18),
+              //   ),
+              // ),
             ],
           ),
         ),
@@ -50,7 +50,7 @@ class TabBarWidget extends StatelessWidget {
           children: [
             Pending(),
             Complete(),
-            Cancel(),
+            // Cancel(),
           ],
         ),
       ),

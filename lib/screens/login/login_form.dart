@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:async';
 import 'package:easy_go_partner/controller/driver_controller.dart';
+import 'package:easy_go_partner/model/address.dart';
 import 'package:easy_go_partner/screens/home/home_view.dart';
 import 'package:easy_go_partner/screens/login/bank_details.dart';
 import 'package:easy_go_partner/screens/login/otp_screen.dart';
@@ -27,29 +28,29 @@ class _LoginFormState extends State<LoginForm> {
   validate() async {
     if (driverController.nameController.text.isEmpty) {
       authController.validSnackBar("Name is not empty");
-    }
-    //  else if (driverController.emailController.text.isEmpty) {
-    //   authController.validSnackBar("Email Address is not empty");
-    // } else if (!driverController.emailController.text.contains("@gmail.com")) {
-    //   authController.validSnackBar("Email Address is not valid");
-    // } 
-    else if (driverController.addressController.text.isEmpty) {
+    } else if (driverController.emailController.text.isEmpty) {
+      authController.validSnackBar("Email Address is not empty");
+    } else if (!driverController.emailController.text.contains("@gmail.com")) {
+      authController.validSnackBar("Email Address is not valid");
+    } else if (driverController.addressController.text.isEmpty) {
       authController.validSnackBar("Address is not empty");
     } else if (driverController.selectedVehicleNotifier.value == null) {
       authController.validSnackBar("Vehicle-type is not empty");
-    } else if (driverController.rcNumController.text.isEmpty) {
-      authController.validSnackBar("RC-Number is not empty");
-    } else if (driverController.rcBookImg == null) {
-      authController.validSnackBar("Upload RC book image");
-    } else if (driverController.vNumController.text.isEmpty) {
-      authController.validSnackBar("Vehicle Number is not empty");
-    } else if (driverController.vehicleImages.length < 2) {
-      authController.validSnackBar("Upload vehicle images image");
-    } else if (driverController.dLController.text.isEmpty) {
-      authController.validSnackBar("DL-Number is not empty");
-    } else if (driverController.licenseImg == null) {
-      authController.validSnackBar("Upload License image");
-    } else {
+    }
+    // else if (driverController.rcNumController.text.isEmpty) {
+    //   authController.validSnackBar("RC-Number is not empty");
+    // } else if (driverController.rcBookImg == null) {
+    //   authController.validSnackBar("Upload RC book image");
+    // } else if (driverController.vNumController.text.isEmpty) {
+    //   authController.validSnackBar("Vehicle Number is not empty");
+    // } else if (driverController.vehicleImages.length < 2) {
+    //   authController.validSnackBar("Upload vehicle images image");
+    // } else if (driverController.dLController.text.isEmpty) {
+    //   authController.validSnackBar("DL-Number is not empty");
+    // } else if (driverController.licenseImg == null) {
+    //   authController.validSnackBar("Upload License image");
+    // }
+    else {
       routePage();
     }
   }
@@ -63,9 +64,14 @@ class _LoginFormState extends State<LoginForm> {
       },
     );
     // await driverController.registerUser(widget.phoneNumber);
-    await Future.delayed(Duration());
+    await Future.delayed(Duration(seconds: 2));
+    // setState(() {
+    //   vehicle.vName = driverController.selectedVehicleNotifier.value;
+    // });
     Navigator.pop(context);
-    await Get.to(() => BankDetails(widget.countryCode, widget.phoneNumber));
+    await Get.to(
+      () => BankDetails(widget.countryCode, widget.phoneNumber),
+    );
   }
 
   Future<void> getImage(ImageSource source, Function(File) onSelected) async {
@@ -158,6 +164,7 @@ class _LoginFormState extends State<LoginForm> {
 
   @override
   Widget build(BuildContext context) {
+
     // print("${widget.countryCode}${widget.phoneNumber}");
     final Size screenSize = MediaQuery.of(context).size;
     final double screenHeight = screenSize.height;
@@ -196,12 +203,12 @@ class _LoginFormState extends State<LoginForm> {
               read: true,
               hint: widget.phoneNumber,
             ),
-            // const SizedBox(height: 20),
-            // formField(
-            //   controller: driverController.emailController,
-            //   "Email",
-            //   Icons.email_outlined,
-            // ),
+            const SizedBox(height: 20),
+            formField(
+              controller: driverController.emailController,
+              "Email",
+              Icons.email_outlined,
+            ),
             const SizedBox(height: 20),
             formField(
               controller: driverController.addressController,

@@ -69,7 +69,7 @@ class _OtpScreenState extends State<OtpScreen> {
                     height: screenHeight * 0.3,
                     // 30% of screen height for image
                     child: Image.asset(
-                      'assets/images/number.jpg',
+                      'assets/images/otp.png',
                       fit: BoxFit.contain,
                     ),
                   ),
@@ -133,6 +133,7 @@ class _OtpScreenState extends State<OtpScreen> {
                       onPress: otpCode.toString().length.isEqual(6)
                           ? () async {
                               try {
+                                Future.delayed(Duration(seconds: 5));
                                 await authController.verifyOtp(otpCode!);
                                 await driverController.registerUser(widget.phoneNumber, widget.accountId);
                                 Get.offAll(() =>  HomeView());

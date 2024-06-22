@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pinput/pinput.dart';
@@ -9,6 +12,7 @@ import 'login_form.dart';
 
 class LoginOtp extends StatefulWidget {
   final String phoneNumber;
+
   // final String countryCode;
 
   const LoginOtp(this.phoneNumber, {Key? key}) : super(key: key);
@@ -21,6 +25,9 @@ class _LoginOtpState extends State<LoginOtp> {
   String? otpCode;
   TextEditingController otpController = TextEditingController();
   AuthController authController = Get.put(AuthController());
+  bool isResendButtonEnabled = false;
+  int start = 60;
+  late Timer timer;
 
   @override
   void initState() {
@@ -28,8 +35,29 @@ class _LoginOtpState extends State<LoginOtp> {
     super.initState();
     authController.phoneAuth(widget.phoneNumber);
     // print("+${selectedCountry.phoneCode + widget..text.trim()}");
+    startTimer();
   }
 
+  void startTimer() {
+    start = 60;
+    isResendButtonEnabled = false;
+    timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() {
+        if (start <= 1) {
+          timer.cancel();
+          isResendButtonEnabled = true;
+        } else {
+          start--;
+        }
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    timer.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -131,9 +159,8 @@ class _LoginOtpState extends State<LoginOtp> {
                           ? () async {
                               try {
                                 await authController.verifyOtp(otpCode!);
-                                Get.offAll(() =>  HomeView());
+                                Get.offAll(() => HomeView());
                               } catch (e) {
-
                                 authController.error("Error verifying OTP", e);
                               }
                             }
@@ -146,16 +173,61 @@ class _LoginOtpState extends State<LoginOtp> {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black38,
+                      color: Colors.black,
                     ),
                   ),
                   // const SizedBox(height: 15),
-                  const Text(
-                    "Resend New Code",
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF0000FF),
+                  // const Text(
+                  //   "Resend New Code",
+                  //   style: TextStyle(
+                  //     fontSize: 14,
+                  //     fontWeight: FontWeight.bold,
+                  //     color: Color(0xFF0000FF),
+                  //   ),
+                  // ),
+                  GestureDetector(
+                    onTap: isResendButtonEnabled
+                        ? () async {
+                            int retryCount = 0;
+                            const int maxRetries = 3;
+
+                            while (retryCount < maxRetries) {
+                              try {
+                                await authController
+                                    .phoneAuth(widget.phoneNumber);
+                                startTimer();
+                                break; // Exit the loop if successful
+                              } catch (e) {
+                                if (e is FirebaseException &&
+                                    e.message == 'Too many attempts') {
+                                  retryCount++;
+                                  if (retryCount >= maxRetries) {
+                                    print(
+                                        "Too many attempts. Please try again later.");
+                                    break;
+                                  }
+                                  await Future.delayed(Duration(
+                                      seconds: 2 *
+                                          retryCount)); // Exponential backoff
+                                } else {
+                                  print("Error: $e");
+                                  break;
+                                }
+                              }
+                            }
+                          }
+                        : null,
+                    child: Text(
+                      isResendButtonEnabled
+                          ? "Resend New Code"
+                          : "Resend Code in $start seconds",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: isResendButtonEnabled
+                            ? Color(0xFF0000FF)
+                            : Colors.grey,
+                      ),
                     ),
                   ),
                 ],

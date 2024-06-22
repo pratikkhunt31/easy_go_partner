@@ -69,6 +69,7 @@ dependencies:
   intl: ^0.17.0
   shimmer: ^3.0.0
   velocity_x: ^3.6.0
+  firebase_app_check: ^0.2.1+8
 #  url_launcher: ^6.1.11
 #  url_launcher_android: ^6.0.20
 

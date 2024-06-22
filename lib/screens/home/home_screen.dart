@@ -111,11 +111,13 @@ class _HomeScreenState extends State<HomeScreen> {
       if (snapshot.exists) {
         Map<String, dynamic> userData =
             Map<String, dynamic>.from(snapshot.value as Map);
-        setState(() {
-          isOnline = userData['is_online'];
-          // nameController.text = userData['name'];
-          // isLoading = false;
-        });
+        if (mounted) {
+          setState(() {
+            isOnline = userData['is_online'];
+            // nameController.text = userData['name'];
+            // isLoading = false;
+          });
+        }
       }
     }
   }

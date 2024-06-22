@@ -1,4 +1,6 @@
+import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pinput/pinput.dart';
@@ -12,7 +14,7 @@ class OtpScreen extends StatefulWidget {
   final String phoneNumber;
   final String accountId;
 
-  const OtpScreen(this.phoneNumber,this.accountId, {Key? key})
+  const OtpScreen(this.phoneNumber, this.accountId, {Key? key})
       : super(key: key);
 
   @override
@@ -24,18 +26,41 @@ class _OtpScreenState extends State<OtpScreen> {
   TextEditingController otpController = TextEditingController();
   AuthController authController = Get.put(AuthController());
   DriverController driverController = Get.put(DriverController());
-
+  bool isResendButtonEnabled = false;
+  int start = 60;
+  late Timer timer;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     authController.phoneAuth(widget.phoneNumber);
+    startTimer();
+  }
+
+  void startTimer() {
+    start = 60;
+    isResendButtonEnabled = false;
+    timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() {
+        if (start <= 1) {
+          timer.cancel();
+          isResendButtonEnabled = true;
+        } else {
+          start--;
+        }
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    timer.cancel();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-
     final Size screenSize = MediaQuery.of(context).size;
     final double screenHeight = screenSize.height;
     final double screenWidth = screenSize.width;
@@ -133,11 +158,11 @@ class _OtpScreenState extends State<OtpScreen> {
                       onPress: otpCode.toString().length.isEqual(6)
                           ? () async {
                               try {
-                                Future.delayed(Duration(seconds: 6));
+                                Future.delayed(Duration(seconds: 4));
                                 await authController.verifyOtp(otpCode!);
-                                await driverController.registerUser(widget.phoneNumber, widget.accountId);
-                                Get.offAll(() =>  HomeView());
-
+                                await driverController.registerUser(
+                                    widget.phoneNumber, widget.accountId);
+                                // Get.offAll(() =>  HomeView());
                               } catch (e) {
                                 // If verification fails, show error message
                                 authController.error("Error verifying OTP", e);
@@ -152,16 +177,61 @@ class _OtpScreenState extends State<OtpScreen> {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black38,
+                      color: Colors.black,
                     ),
                   ),
-                  // const SizedBox(height: 15),
-                  const Text(
-                    "Resend New Code",
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF0000FF),
+                  const SizedBox(height: 8),
+                  // const Text(
+                  //   "Resend New Code",
+                  //   style: TextStyle(
+                  //     fontSize: 14,
+                  //     fontWeight: FontWeight.bold,
+                  //     color: Color(0xFF0000FF),
+                  //   ),
+                  // ),
+                  GestureDetector(
+                    onTap: isResendButtonEnabled
+                        ? () async {
+                            int retryCount = 0;
+                            const int maxRetries = 3;
+
+                            while (retryCount < maxRetries) {
+                              try {
+                                await authController
+                                    .phoneAuth(widget.phoneNumber);
+                                startTimer();
+                                break; // Exit the loop if successful
+                              } catch (e) {
+                                if (e is FirebaseException &&
+                                    e.message == 'Too many attempts') {
+                                  retryCount++;
+                                  if (retryCount >= maxRetries) {
+                                    print(
+                                        "Too many attempts. Please try again later.");
+                                    break;
+                                  }
+                                  await Future.delayed(Duration(
+                                      seconds: 2 *
+                                          retryCount)); // Exponential backoff
+                                } else {
+                                  print("Error: $e");
+                                  break;
+                                }
+                              }
+                            }
+                          }
+                        : null,
+                    child: Text(
+                      isResendButtonEnabled
+                          ? "Resend New Code"
+                          : "Resend Code in $start seconds",
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: isResendButtonEnabled
+                            ? Color(0xFF0000FF)
+                            : Colors.grey,
+                      ),
                     ),
                   ),
                 ],

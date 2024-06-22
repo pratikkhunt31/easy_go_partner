@@ -78,7 +78,7 @@ class _BankDetailsState extends State<BankDetails> {
         final accountId = responseData['account_id'];
         log("message");
         // await storeAccountIdInFirebase(accountId);
-        routePage(accountId);
+        // routePage(accountId);
         await Get.to(() => OtpScreen(widget.countryCode + widget.phoneNumber, accountId));
 
       } else {
@@ -91,7 +91,7 @@ class _BankDetailsState extends State<BankDetails> {
     }
   }
 
-  routePage(String accountId) async {
+  // routePage(String accountId) async {
     // showDialog(
     //   context: context,
     //   barrierDismissible: false,
@@ -101,7 +101,7 @@ class _BankDetailsState extends State<BankDetails> {
     // );
     // await Future.delayed(Duration(seconds: 2));
     // Navigator.pop(context);
-  }
+  // }
 
   Future<void> getImage(ImageSource source, Function(File) onSelected) async {
     try {
@@ -174,7 +174,7 @@ class _BankDetailsState extends State<BankDetails> {
             const SizedBox(height: 20),
             formField(
               controller: driverController.bNameController,
-              "Enter Your Name At Your Bank",
+              "Enter Your Bank Name",
               Icons.account_balance_outlined,
             ),
             const SizedBox(height: 20),

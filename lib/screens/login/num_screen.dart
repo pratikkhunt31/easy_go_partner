@@ -46,12 +46,14 @@ class _NumberScreenState extends State<NumberScreen> {
     }
   }
 
+
+
   @override
   Widget build(BuildContext context) {
     phoneController.selection = TextSelection.fromPosition(
         TextPosition(offset: phoneController.text.length));
     return Scaffold(
-      resizeToAvoidBottomInset: true,
+      resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
@@ -63,7 +65,7 @@ class _NumberScreenState extends State<NumberScreen> {
                 ),
                 child: Padding(
                   padding: EdgeInsets.symmetric(
-                    vertical: constraints.maxHeight * 0.05,
+                    // vertical: constraints.maxHeight * 0.09,
                     horizontal: constraints.maxWidth * 0.05,
                   ),
                   child: SingleChildScrollView(
@@ -79,7 +81,7 @@ class _NumberScreenState extends State<NumberScreen> {
                             fit: BoxFit.contain,
                           ),
                         ),
-                        SizedBox(height: constraints.maxHeight * 0.01),
+                        // SizedBox(height: constraints.maxHeight * 0.01),
                         Text(
                           "Let's get started",
                           style: TextStyle(
@@ -180,44 +182,42 @@ class _NumberScreenState extends State<NumberScreen> {
                           ),
                         ),
                         SizedBox(height: constraints.maxHeight * 0.02),
-                        SizedBox(
-                          width: double.infinity,
-                          height: constraints.maxHeight * 0.065,
-                          child: CustomButton(
-                            hint: "Login",
-                            color: phoneController.text.length.isEqual(10)
-                                ? const Color(0xFF0000FF)
-                                : Colors.grey,
-                            borderRadius: BorderRadius.circular(25.0),
-                            onPress: phoneController.text.length.isEqual(10)
-                                ? () async {
-                                    try {
-                                      await Future.delayed(
-                                          const Duration(seconds: 5));
-                                      if (!authController.isValidPhoneNumber(
-                                          phoneController.text)) {
-                                        // Show an error Snack bar if the phone number is invalid
+                          SizedBox(
+                            width: double.infinity,
+                            height: constraints.maxHeight * 0.065,
+                            child: CustomButton(
+                              hint: "Login",
+                              color: phoneController.text.length.isEqual(10)
+                                  ? const Color(0xFF0000FF)
+                                  : Colors.grey,
+                              borderRadius: BorderRadius.circular(25.0),
+                              onPress: phoneController.text.length.isEqual(10)
+                                  ? () async {
+                                      try {
+                                        await Future.delayed(
+                                            const Duration(seconds: 5));
+                                        if (!authController.isValidPhoneNumber(
+                                            phoneController.text)) {
+                                          // Show an error Snack bar if the phone number is invalid
+                                          authController.validSnackBar(
+                                              "Invalid phone number. Please enter a valid 10-digit number.");
+                                          return;
+                                        }
+                                        // print(
+                                        //     "+${selectedCountry.phoneCode + phoneController.text.trim()}");
+                                        checkUserDataAndNavigate();
+                                        // Get.to(() => LoginOtp(
+                                        //     "+${selectedCountry.phoneCode}" +
+                                        //         phoneController.text.trim()));
+                                      } catch (e) {
                                         authController.validSnackBar(
-                                            "Invalid phone number. Please enter a valid 10-digit number.");
-                                        return;
+                                            "Error validating phone number: $e");
                                       }
-                                      // Proceed with login
-
-                                      // print(
-                                      //     "+${selectedCountry.phoneCode + phoneController.text.trim()}");
-                                      checkUserDataAndNavigate();
-                                      // Get.to(() => LoginOtp(
-                                      //     "+${selectedCountry.phoneCode}" +
-                                      //         phoneController.text.trim()));
-                                    } catch (e) {
-                                      authController.validSnackBar(
-                                          "Error validating phone number: $e");
                                     }
-                                  }
-                                : () {},
-                          ),
-                        ),
-                        SizedBox(height: constraints.maxHeight * 0.035),
+                                  : () {},
+                            ),
+                          ) ,
+                        SizedBox(height: constraints.maxHeight * 0.025),
                         Padding(
                           padding: EdgeInsets.symmetric(
                               horizontal: constraints.maxWidth * 0.05),

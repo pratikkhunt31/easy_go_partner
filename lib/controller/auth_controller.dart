@@ -32,12 +32,13 @@ class AuthController extends GetxController {
         forceResendingToken: resendTokenId,
         verificationFailed: (FirebaseAuthException e) {
           if (e.code == 'Invalid phone number') {
-            print("The phone is not valid");
+            validSnackBar("The phone is not valid");
+          } else {
+            validSnackBar("Phone verification failed: ${e.message}");
           }
         },
         codeSent: (String verificationId, int? resendToken) async {
           otpSnackBar("OTP sent successfully");
-
           verId = verificationId;
           resendTokenId = resendToken;
         },

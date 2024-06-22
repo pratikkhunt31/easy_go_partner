@@ -63,9 +63,6 @@ class _LoginFormState extends State<LoginForm> {
     );
     // await driverController.registerUser(widget.phoneNumber);
     await Future.delayed(Duration(seconds: 2));
-    // setState(() {
-    //   vehicle.vName = driverController.selectedVehicleNotifier.value;
-    // });
     Navigator.pop(context);
     await Get.to(
       () => BankDetails(widget.countryCode, widget.phoneNumber),
@@ -255,9 +252,6 @@ class _LoginFormState extends State<LoginForm> {
                     'Auto Rickshaw',
                     'e-Rickshaw',
                     'e-Tempo',
-                    'Activa',
-                    'Bike',
-                    'e-Bike'
                   ],
                   value: selectedVehicle,
                   onChanged: (String? newValue) {

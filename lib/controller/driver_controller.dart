@@ -45,6 +45,90 @@ class DriverController extends GetxController {
     return await taskSnapshot.ref.getDownloadURL();
   }
 
+  // Future<void> registerUser(String phoneNumber, String accountId) async {
+  //   int retryCount = 0;
+  //   const int maxRetries = 3;
+  //
+  //   while (retryCount < maxRetries) {
+  //     try {
+  //       if (currentUser != null) {
+  //         String rcBookImageUrl = '';
+  //         String licenseImageUrl = '';
+  //         String passBookImageUrl = '';
+  //         List<String> vehicleImageUrls = [];
+  //
+  //         if (rcBookImg != null) {
+  //           rcBookImageUrl = await uploadFile(rcBookImg!);
+  //         }
+  //
+  //         if (licenseImg != null) {
+  //           licenseImageUrl = await uploadFile(licenseImg!);
+  //         }
+  //
+  //         if (passBookImg != null) {
+  //           passBookImageUrl = await uploadFile(passBookImg!);
+  //         }
+  //
+  //         for (File image in vehicleImages) {
+  //           vehicleImageUrls.add(await uploadFile(image));
+  //         }
+  //
+  //         Map driverData = {
+  //           'account_id': accountId,
+  //           'name': nameController.text.trim(),
+  //           'phoneNumber': phoneNumber.trim(),
+  //           'email': emailController.text.trim(),
+  //           'street': addressController.text.trim(),
+  //           'city': cityController.text.trim(),
+  //           'state': stateController.text.trim(),
+  //           'postal_code': pinCodeController.text.trim(),
+  //           'country': "IN",
+  //           'PAN_number': panController.text.trim(),
+  //           'bank_name': bNameController.text.trim(),
+  //           'acc_number': accNumController.text.trim(),
+  //           'confirm_accNumber': cAccNumController.text.trim(),
+  //           'IFSC_code': ifscController.text.trim(),
+  //           'rcNumber': rcNumController.text.trim(),
+  //           'dl_number': dLController.text.trim(),
+  //           'vehicleType': selectedVehicleNotifier.value,
+  //           'is_verified': false,
+  //           'is_online': true,
+  //           'd_id': currentUser!.uid,
+  //           'passBookImage': passBookImageUrl,
+  //           'rcBookImage': rcBookImageUrl,
+  //           'vehicleImages': vehicleImageUrls,
+  //           'licenseImage': licenseImageUrl,
+  //         };
+  //
+  //         DatabaseReference database = FirebaseDatabase.instance.ref();
+  //         await database.child('drivers').child(currentUser!.uid).set(driverData);
+  //
+  //         successSnackBar("User registered successfully!");
+  //         Get.offAll(() => HomeView());
+  //
+  //         clearControllers();
+  //         break; // Exit the loop if successful
+  //
+  //       } else {
+  //         validSnackBar("Account has not been created");
+  //       }
+  //     } catch (e) {
+  //       if (e is FirebaseException && e.message == 'Too many attempts') {
+  //         retryCount++;
+  //         if (retryCount >= maxRetries) {
+  //           error("Too many attempts. Please try again later.", e);
+  //           break;
+  //         }
+  //         await Future.delayed(Duration(seconds: 2 * retryCount)); // Exponential backoff
+  //       } else {
+  //         error("Error registering user", e);
+  //         break;
+  //       }
+  //     }
+  //   }
+  // }
+
+
   Future<void> registerUser(String phoneNumber, String accountId) async {
     try {
       if (currentUser != null) {
@@ -69,7 +153,7 @@ class DriverController extends GetxController {
           vehicleImageUrls.add(await uploadFile(image));
         }
 
-        Map<String, dynamic> driverData = {
+        Map driverData = {
           'account_id': accountId,
           'name': nameController.text.trim(),
           'phoneNumber': phoneNumber.trim(),
@@ -100,6 +184,8 @@ class DriverController extends GetxController {
         await database.child('drivers').child(currentUser!.uid).set(driverData);
 
         successSnackBar("User registered successfully!");
+        Get.offAll(() =>  HomeView());
+
         clearControllers();
 
       } else {

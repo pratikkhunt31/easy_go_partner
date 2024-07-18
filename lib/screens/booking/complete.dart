@@ -40,7 +40,7 @@ class _CompleteState extends State<Complete> {
         rides.forEach((key, value) {
           Map<String, dynamic> rideData = Map<String, dynamic>.from(value);
           if (rideData['status'] == 'complete') {
-            filteredRides.add(Ride.fromMap(rideData));
+            filteredRides.add(Ride.fromMap(key, rideData));
           }
         });
 

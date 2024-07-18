@@ -61,6 +61,50 @@ class AuthController extends GetxController {
     }
   }
 
+  rideAuth(String phone) async {
+    try {
+      await auth.verifyPhoneNumber(
+        phoneNumber: phone,
+        timeout: const Duration(seconds: 60),
+        verificationCompleted: (PhoneAuthCredential credential) async {
+          // Automatically handling the verification
+        },
+        forceResendingToken: resendTokenId,
+        verificationFailed: (FirebaseAuthException e) {
+          if (e.code == 'invalid-phone-number') {
+            validSnackBar("The phone number is not valid");
+          } else {
+            validSnackBar("Phone verification failed: ${e.message}");
+          }
+        },
+        codeSent: (String verificationId, int? resendToken) async {
+          otpSnackBar("OTP sent successfully");
+          verId = verificationId;
+          resendTokenId = resendToken;
+        },
+        codeAutoRetrievalTimeout: (String verificationId) {},
+      );
+    } catch (e) {
+      log('Error $e');
+    }
+  }
+
+  Future<void> verifyRideOtp(String otpCode) async {
+    try {
+      PhoneAuthCredential credential = PhoneAuthProvider.credential(
+          verificationId: verId!, smsCode: otpCode);
+      // Simulate verification by catching any errors during credential creation
+      if (credential.smsCode == otpCode) {
+        // OTP is verified successfully
+        return;
+      } else {
+        throw Exception("Invalid OTP");
+      }
+    } catch (e) {
+      throw Exception("Error verifying OTP: $e");
+    }
+  }
+
   // saveUserInfo(String name, String email, String phone) async {
   //   try {
   //     if (currentUser != null) {

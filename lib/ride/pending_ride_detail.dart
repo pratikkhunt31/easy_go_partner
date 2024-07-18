@@ -1,7 +1,11 @@
 import 'dart:async';
+import 'dart:developer';
 
+import 'package:easy_go_partner/ride/verify_ride.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:shimmer/shimmer.dart';
 import '../assistants/assistantsMethod.dart';
@@ -25,11 +29,13 @@ class _PendingRideDetailsState extends State<PendingRideDetails> {
   Set<Polyline> polylineSet = {};
   Set<Marker> markersSet = {};
   bool isLoading = true;
+  bool isRideStarted = false;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    isRideStarted = widget.ride.isStarted;
     Future.microtask(() {
       showDialog(
         context: context,
@@ -63,12 +69,27 @@ class _PendingRideDetailsState extends State<PendingRideDetails> {
     );
   }
 
+  Future<void> startRide() async {
+    DatabaseReference rideRequestRef = FirebaseDatabase.instance
+        .ref()
+        .child('Ride Request')
+        .child(widget.ride.rideId);
+    await rideRequestRef.update({
+      'is_started': true,
+    });
+
+    setState(() {
+      isRideStarted = true;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text("Ride Details"),
         backgroundColor: const Color(0xFF0000FF),
+        elevation: 0.0,
       ),
       body: Stack(
         children: [
@@ -100,16 +121,45 @@ class _PendingRideDetailsState extends State<PendingRideDetails> {
                     ),
                   ),
                 ),
-                SizedBox(height: 15),
+                SizedBox(height: 5),
                 Expanded(
                   child: SingleChildScrollView(
                     child: Column(
                       children: [
+                        if (!isRideStarted) ...[
+                          Padding(
+                            padding: EdgeInsets.only(left: 12.0, right: 12.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "Have you started the ride?",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                SizedBox(height: 8),
+                                Container(
+                                  width: 100,
+                                  child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Color(0xFF0000FF),
+                                    ),
+                                    onPressed: startRide,
+                                    child: Text("Start Ride"),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                         Padding(
                           padding: EdgeInsets.only(left: 12.0, right: 8.0),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
+                              SizedBox(height: 10),
                               Text(
                                 "Contact Details",
                                 style: TextStyle(
@@ -134,23 +184,23 @@ class _PendingRideDetailsState extends State<PendingRideDetails> {
                                   ),
                                 ),
                         ),
-                        SizedBox(height: 15),
-                        Padding(
-                          padding: EdgeInsets.only(left: 12.0, right: 8.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Fare Summary",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
                         SizedBox(height: 8),
+                        // Padding(
+                        //   padding: EdgeInsets.only(left: 12.0, right: 8.0),
+                        //   child: Row(
+                        //     mainAxisAlignment: MainAxisAlignment.start,
+                        //     children: [
+                        //       Text(
+                        //         "Fare Summary",
+                        //         style: TextStyle(
+                        //           fontWeight: FontWeight.bold,
+                        //           fontSize: 16,
+                        //         ),
+                        //       ),
+                        //     ],
+                        //   ),
+                        // ),
+                        // SizedBox(height: 8),
                         Padding(
                           padding: const EdgeInsets.only(left: 8.0, right: 8.0),
                           child: isLoading
@@ -205,7 +255,7 @@ class _PendingRideDetailsState extends State<PendingRideDetails> {
                                               MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
-                                              "Amount Payable (rounded)",
+                                              "Amount Receive (rounded)",
                                               style: TextStyle(
                                                   fontWeight: FontWeight.bold),
                                             ),
@@ -261,7 +311,46 @@ class _PendingRideDetailsState extends State<PendingRideDetails> {
                                   ),
                                 ),
                         ),
-                        SizedBox(height: 100),
+                        SizedBox(height: 8),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+                          child: isLoading
+                              ? buildShimmerEffect() // Show shimmer if isLoading is true
+                              : Card(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(5.0),
+                                  ),
+                                  color: Colors.white,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(15.0),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "Payment",
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                        Divider(),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text("Payment Status"),
+                                            Text("${widget.ride.payment}"),
+                                          ],
+                                        ),
+
+                                        // const SizedBox(height: 8),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                        ),
+                        SizedBox(height: 80),
                       ],
                     ),
                   ),
@@ -269,45 +358,50 @@ class _PendingRideDetailsState extends State<PendingRideDetails> {
               ],
             ),
           ),
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: Container(
-              padding:
-                  EdgeInsets.only(top: 10, left: 15, right: 15, bottom: 18),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black26,
-                    blurRadius: 10,
-                    offset: Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: isLoading
-                  ? Shimmer.fromColors(
-                      baseColor: Colors.grey[300]!,
-                      highlightColor: Colors.grey[100]!,
-                      child: CustomButton(
+          if (isRideStarted)
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: Container(
+                padding:
+                    EdgeInsets.only(top: 10, left: 15, right: 15, bottom: 18),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black26,
+                      blurRadius: 10,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: isLoading
+                    ? Shimmer.fromColors(
+                        baseColor: Colors.grey[300]!,
+                        highlightColor: Colors.grey[100]!,
+                        child: CustomButton(
+                          hint: "Mark as Complete",
+                          onPress: () async {},
+                          borderRadius: BorderRadius.all(Radius.circular(5)),
+                        ),
+                      )
+                    : CustomButton(
                         hint: "Mark as Complete",
                         onPress: () async {
-                          // confirmLocation();
-                          // _locationController.updateSelectedLocation(currentAddress!);
-                          // Get.back();
+                          log("+91" + widget.ride.receiverPhone);
+                          Get.to(
+                            () => VerifyRideOtp(
+                              "+91" + widget.ride.receiverPhone,
+                              widget.ride.rideId,
+                            ),
+                          );
                         },
                         borderRadius: BorderRadius.all(Radius.circular(5)),
                       ),
-                    )
-                  : CustomButton(
-                      hint: "Mark as Complete",
-                      onPress: () async {},
-                      borderRadius: BorderRadius.all(Radius.circular(5)),
-                    ),
+              ),
             ),
-          ),
         ],
       ),
     );
@@ -406,5 +500,3 @@ class _PendingRideDetailsState extends State<PendingRideDetails> {
     }
   }
 }
-
-

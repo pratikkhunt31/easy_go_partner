@@ -39,7 +39,7 @@ class _PendingState extends State<Pending> {
         rides.forEach((key, value) {
           Map<String, dynamic> rideData = Map<String, dynamic>.from(value);
           if (rideData['status'] == 'pending') {
-            filteredRides.add(Ride.fromMap(rideData));
+            filteredRides.add(Ride.fromMap(key, rideData));
           }
         });
 

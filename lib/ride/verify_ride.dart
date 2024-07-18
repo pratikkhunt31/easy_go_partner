@@ -1,26 +1,29 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pinput/pinput.dart';
+import 'package:velocity_x/velocity_x.dart';
 
 import '../../controller/auth_controller.dart';
 import '../../widget/custom_widget.dart';
-import '../home/home_view.dart';
 
-class LoginOtp extends StatefulWidget {
+class VerifyRideOtp extends StatefulWidget {
   final String phoneNumber;
+  final String rideId;
 
   // final String countryCode;
 
-  const LoginOtp(this.phoneNumber, {Key? key}) : super(key: key);
+  const VerifyRideOtp(this.phoneNumber, this.rideId, {Key? key}) : super(key: key);
 
   @override
-  State<LoginOtp> createState() => _LoginOtpState();
+  State<VerifyRideOtp> createState() => _VerifyRideOtpState();
 }
 
-class _LoginOtpState extends State<LoginOtp> {
+class _VerifyRideOtpState extends State<VerifyRideOtp> {
   String? otpCode;
   TextEditingController otpController = TextEditingController();
   AuthController authController = Get.put(AuthController());
@@ -32,7 +35,8 @@ class _LoginOtpState extends State<LoginOtp> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    authController.phoneAuth(widget.phoneNumber);
+    authController.rideAuth(widget.phoneNumber);
+    log(widget.phoneNumber);
     // print("+${selectedCountry.phoneCode + widget..text.trim()}");
     startTimer();
   }
@@ -56,6 +60,16 @@ class _LoginOtpState extends State<LoginOtp> {
   void dispose() {
     timer.cancel();
     super.dispose();
+  }
+
+  Future<void> completeRide() async {
+    DatabaseReference rideRequestRef = FirebaseDatabase.instance
+        .ref()
+        .child('Ride Request')
+        .child(widget.rideId);
+    await rideRequestRef.update({
+      'status': "complete",
+    });
   }
 
   @override
@@ -156,13 +170,22 @@ class _LoginOtpState extends State<LoginOtp> {
                       borderRadius: BorderRadius.circular(25.0),
                       onPress: otpCode.toString().length.isEqual(6)
                           ? () async {
-                              try {
-                                await authController.verifyOtp(otpCode!);
-                                Get.offAll(() => HomeView());
-                              } catch (e) {
-                                authController.error("Error verifying OTP", e);
-                              }
-                            }
+                        try {
+                          await authController.verifyOtp(otpCode!);
+                          await completeRide();
+                          Get.snackbar(
+                            "Success",
+                            "Ride completed",
+                            backgroundColor: Colors.green,
+                            colorText: Colors.white,
+                          );
+                          Navigator.pop(context);
+                          Navigator.pop(context);
+                          // Get.offAll(() => HomeView());
+                        } catch (e) {
+                          authController.error("Error verifying OTP", e);
+                        }
+                      }
                           : () {},
                     ),
                   ),
@@ -187,34 +210,34 @@ class _LoginOtpState extends State<LoginOtp> {
                   GestureDetector(
                     onTap: isResendButtonEnabled
                         ? () async {
-                            int retryCount = 0;
-                            const int maxRetries = 3;
+                      int retryCount = 0;
+                      const int maxRetries = 3;
 
-                            while (retryCount < maxRetries) {
-                              try {
-                                await authController
-                                    .phoneAuth(widget.phoneNumber);
-                                startTimer();
-                                break; // Exit the loop if successful
-                              } catch (e) {
-                                if (e is FirebaseException &&
-                                    e.message == 'Too many attempts') {
-                                  retryCount++;
-                                  if (retryCount >= maxRetries) {
-                                    print(
-                                        "Too many attempts. Please try again later.");
-                                    break;
-                                  }
-                                  await Future.delayed(Duration(
-                                      seconds: 2 *
-                                          retryCount)); // Exponential backoff
-                                } else {
-                                  print("Error: $e");
-                                  break;
-                                }
-                              }
+                      while (retryCount < maxRetries) {
+                        try {
+                          await authController
+                              .rideAuth(widget.phoneNumber);
+                          startTimer();
+                          break; // Exit the loop if successful
+                        } catch (e) {
+                          if (e is FirebaseException &&
+                              e.message == 'Too many attempts') {
+                            retryCount++;
+                            if (retryCount >= maxRetries) {
+                              print(
+                                  "Too many attempts. Please try again later.");
+                              break;
                             }
+                            await Future.delayed(Duration(
+                                seconds: 2 *
+                                    retryCount)); // Exponential backoff
+                          } else {
+                            print("Error: $e");
+                            break;
                           }
+                        }
+                      }
+                    }
                         : null,
                     child: Text(
                       isResendButtonEnabled

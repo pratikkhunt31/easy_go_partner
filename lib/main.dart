@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 import 'controller/driver_controller.dart';
+import 'network_dependency.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,6 +22,7 @@ void main() async {
   ]);
   Get.put(DriverController());
   runApp(const MyApp());
+  DependencyInjection.init();
 }
 
 class MyApp extends StatelessWidget {

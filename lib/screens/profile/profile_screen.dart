@@ -1,14 +1,18 @@
 import 'package:easy_go_partner/screens/profile/edit_bank.dart';
+import 'package:easy_go_partner/screens/profile/t&c.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:ionicons/ionicons.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:page_transition/page_transition.dart';
 
 import '../../consts/firebase_consts.dart';
 import '../../controller/auth_controller.dart';
 import '../../widget/custom_widget.dart';
 import '../login/num_screen.dart';
+import 'contact_detail.dart';
 import 'edit_profile.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -21,11 +25,13 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   final nameController = TextEditingController();
   bool isLoading = true;
+  String appVersion = "";
 
   @override
   void initState() {
     super.initState();
     loadUserData();
+    loadAppVersion();
   }
 
   @override
@@ -50,6 +56,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
         });
       }
     }
+  }
+
+  Future<void> loadAppVersion() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    setState(() {
+      appVersion = packageInfo.version;
+    });
   }
 
   @override
@@ -98,13 +111,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             color: Color(0xFF0000FF),
                             shape: BoxShape.circle,
                           ),
-                          padding: EdgeInsets.all(20), // Adjust the padding as needed
+                          padding: EdgeInsets.all(
+                              20), // Adjust the padding as needed
                           child: Text(
-                            nameController.text.isNotEmpty ? nameController.text[0] : '',
+                            nameController.text.isNotEmpty
+                                ? nameController.text[0]
+                                : '',
                             style: TextStyle(
-                              fontSize: 24, // Adjust the font size as needed
-                              fontWeight: FontWeight.bold, // Optional: make the text bold
-                              color: Colors.white, // Adjust the text color as needed
+                              fontSize: 24,
+                              // Adjust the font size as needed
+                              fontWeight: FontWeight.bold,
+                              // Optional: make the text bold
+                              color: Colors
+                                  .white, // Adjust the text color as needed
                             ),
                           ),
                         ),
@@ -132,7 +151,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         const Spacer(),
                         ForwardIcon(
                           onTap: () {
-                            Get.to(() => EditProfileScreen());
+                            Navigator.push(
+                              context,
+                              PageTransition(
+                                child: EditProfileScreen(),
+                                type: PageTransitionType.bottomToTop,
+                              ),
+                            );
                           },
                         ),
                       ],
@@ -162,7 +187,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     bgColor: Colors.red.shade100,
                     iconColor: Colors.red,
                     onTap: () {
-                      Get.to(() => EditBankDetails());
+                      Navigator.push(
+                        context,
+                        PageTransition(
+                          child: EditBankDetails(),
+                          type: PageTransitionType.bottomToTop,
+                        ),
+                      );
                     },
                   ),
                   const SizedBox(height: 20),
@@ -171,16 +202,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     icon: Ionicons.text,
                     bgColor: Colors.blue.shade100,
                     iconColor: Colors.blue,
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        PageTransition(
+                          child:
+                          TermsConditionsPage(),
+                          type: PageTransitionType.bottomToTop,
+                        ),
+                      );
+                    },
                   ),
                   const SizedBox(height: 20),
                   SettingItem(
-                    title: "Help",
+                    title: "Help & Support",
                     icon: Ionicons.help,
                     bgColor: Colors.green.shade100,
                     iconColor: Colors.green,
                     onTap: () {
-                      // print(currentUser!);
+                      Navigator.push(
+                        context,
+                        PageTransition(
+                          child:
+                          ContactDetailsPage(),
+                          type: PageTransitionType.bottomToTop,
+                        ),
+                      );
                     },
                   ),
                   const SizedBox(height: 20),
@@ -198,6 +245,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         print(e);
                       }
                     },
+                  ),
+                  const SizedBox(height: 20),
+                  Center(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text(
+                          "App Version",
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey,
+                          ),
+                        ),
+                        const SizedBox(width: 3),
+                        Text(
+                          appVersion,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            // fontWeight: FontWeight.bold,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),

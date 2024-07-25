@@ -87,190 +87,190 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 size: 50.0,
               ),
             )
-          : Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // const Text(
-                  //   "Setting",
-                  //   style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
-                  // ),
-                  // const SizedBox(height: 10),
-                  // const Text(
-                  //   "Account",
-                  //   style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
-                  // ),
-                  // const SizedBox(height: 20),
-                  SizedBox(
-                    width: double.infinity,
-                    child: Row(
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            color: Color(0xFF0000FF),
-                            shape: BoxShape.circle,
+          : SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // const Text(
+                    //   "Setting",
+                    //   style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
+                    // ),
+                    // const SizedBox(height: 10),
+                    // const Text(
+                    //   "Account",
+                    //   style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
+                    // ),
+                    // const SizedBox(height: 20),
+                    SizedBox(
+                      width: double.infinity,
+                      child: Row(
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Color(0xFF0000FF),
+                              shape: BoxShape.circle,
+                            ),
+                            padding: EdgeInsets.all(
+                                20), // Adjust the padding as needed
+                            child: Text(
+                              nameController.text.isNotEmpty
+                                  ? nameController.text[0]
+                                  : '',
+                              style: TextStyle(
+                                fontSize: 24,
+                                // Adjust the font size as needed
+                                fontWeight: FontWeight.bold,
+                                // Optional: make the text bold
+                                color: Colors
+                                    .white, // Adjust the text color as needed
+                              ),
+                            ),
                           ),
-                          padding: EdgeInsets.all(
-                              20), // Adjust the padding as needed
-                          child: Text(
-                            nameController.text.isNotEmpty
-                                ? nameController.text[0]
-                                : '',
+                          const SizedBox(width: 20),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                nameController.text.toString(),
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              SizedBox(height: 3),
+                              Text(
+                                "Personal Info",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const Spacer(),
+                          ForwardIcon(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                PageTransition(
+                                  child: EditProfileScreen(),
+                                  type: PageTransitionType.bottomToTop,
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    const Text(
+                      "Settings",
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    // const SizedBox(height: 20),
+                    // SettingItem(
+                    //   title: "Language",
+                    //   value: "Gujarati",
+                    //   icon: Ionicons.earth,
+                    //   bgColor: Colors.orange.shade100,
+                    //   iconColor: Colors.orange,
+                    //   onTap: () {},
+                    // ),
+                    const SizedBox(height: 20),
+                    SettingItem(
+                      title: "Bank Details",
+                      icon: Ionicons.receipt_sharp,
+                      bgColor: Colors.red.shade100,
+                      iconColor: Colors.red,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          PageTransition(
+                            child: EditBankDetails(),
+                            type: PageTransitionType.bottomToTop,
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    SettingItem(
+                      title: "Terms & Condition",
+                      icon: Ionicons.text,
+                      bgColor: Colors.blue.shade100,
+                      iconColor: Colors.blue,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          PageTransition(
+                            child: TermsConditionsPage(),
+                            type: PageTransitionType.bottomToTop,
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    SettingItem(
+                      title: "Help & Support",
+                      icon: Ionicons.help,
+                      bgColor: Colors.green.shade100,
+                      iconColor: Colors.green,
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          PageTransition(
+                            child: ContactDetailsPage(),
+                            type: PageTransitionType.bottomToTop,
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    SettingItem(
+                      title: "LogOut",
+                      icon: Ionicons.log_out_sharp,
+                      bgColor: Colors.red.shade100,
+                      iconColor: Colors.red,
+                      onTap: () async {
+                        try {
+                          print("logout");
+                          await authController.logout();
+                          Get.offAll(() => NumberScreen());
+                        } catch (e) {
+                          print(e);
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    Center(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text(
+                            "App Version",
                             style: TextStyle(
-                              fontSize: 24,
-                              // Adjust the font size as needed
-                              fontWeight: FontWeight.bold,
-                              // Optional: make the text bold
-                              color: Colors
-                                  .white, // Adjust the text color as needed
+                              fontSize: 14,
+                              color: Colors.grey,
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 20),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              nameController.text.toString(),
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w500,
-                              ),
+                          const SizedBox(width: 3),
+                          Text(
+                            appVersion,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              // fontWeight: FontWeight.bold,
+                              color: Colors.grey,
                             ),
-                            SizedBox(height: 3),
-                            Text(
-                              "Personal Info",
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.grey,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const Spacer(),
-                        ForwardIcon(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              PageTransition(
-                                child: EditProfileScreen(),
-                                type: PageTransitionType.bottomToTop,
-                              ),
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  const Text(
-                    "Settings",
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  // const SizedBox(height: 20),
-                  // SettingItem(
-                  //   title: "Language",
-                  //   value: "Gujarati",
-                  //   icon: Ionicons.earth,
-                  //   bgColor: Colors.orange.shade100,
-                  //   iconColor: Colors.orange,
-                  //   onTap: () {},
-                  // ),
-                  const SizedBox(height: 20),
-                  SettingItem(
-                    title: "Bank Details",
-                    icon: Ionicons.receipt_sharp,
-                    bgColor: Colors.red.shade100,
-                    iconColor: Colors.red,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        PageTransition(
-                          child: EditBankDetails(),
-                          type: PageTransitionType.bottomToTop,
-                        ),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 20),
-                  SettingItem(
-                    title: "Terms & Condition",
-                    icon: Ionicons.text,
-                    bgColor: Colors.blue.shade100,
-                    iconColor: Colors.blue,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        PageTransition(
-                          child:
-                          TermsConditionsPage(),
-                          type: PageTransitionType.bottomToTop,
-                        ),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 20),
-                  SettingItem(
-                    title: "Help & Support",
-                    icon: Ionicons.help,
-                    bgColor: Colors.green.shade100,
-                    iconColor: Colors.green,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        PageTransition(
-                          child:
-                          ContactDetailsPage(),
-                          type: PageTransitionType.bottomToTop,
-                        ),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 20),
-                  SettingItem(
-                    title: "LogOut",
-                    icon: Ionicons.log_out_sharp,
-                    bgColor: Colors.red.shade100,
-                    iconColor: Colors.red,
-                    onTap: () async {
-                      try {
-                        print("logout");
-                        await authController.logout();
-                        Get.offAll(() => NumberScreen());
-                      } catch (e) {
-                        print(e);
-                      }
-                    },
-                  ),
-                  const SizedBox(height: 20),
-                  Center(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text(
-                          "App Version",
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey,
                           ),
-                        ),
-                        const SizedBox(width: 3),
-                        Text(
-                          appVersion,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            // fontWeight: FontWeight.bold,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
     );

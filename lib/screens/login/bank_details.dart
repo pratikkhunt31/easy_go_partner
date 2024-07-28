@@ -1,8 +1,7 @@
-import 'dart:developer';
+
 import 'dart:io';
 import 'dart:convert';
 import 'package:easy_go_partner/screens/login/otp_screen.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -10,14 +9,13 @@ import 'package:http/http.dart' as http;
 
 import '../../controller/auth_controller.dart';
 import '../../controller/driver_controller.dart';
-import '../../model/address.dart';
 import '../../widget/custom_widget.dart';
 
 class BankDetails extends StatefulWidget {
   final String countryCode;
   final String phoneNumber;
 
-  const BankDetails(this.countryCode, this.phoneNumber, {super.key});
+    const BankDetails(this.countryCode, this.phoneNumber, {super.key});
 
   @override
   State<BankDetails> createState() => _BankDetailsState();
@@ -30,7 +28,7 @@ class _BankDetailsState extends State<BankDetails> {
   void validate() async {
     if (driverController.panController.text.isEmpty) {
       authController.validSnackBar("PAN Number cannot be empty");
-    } else if (driverController.bNameController.text.isEmpty) {
+    } else if (driverController.beneficiaryNameController.text.isEmpty) {
       authController.validSnackBar("Bank Name cannot be empty");
     } else if (driverController.ifscController.text.isEmpty) {
       authController.validSnackBar("IFSC Number cannot be empty");
@@ -64,7 +62,7 @@ class _BankDetailsState extends State<BankDetails> {
         url,
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
-          "beneficiary_name": driverController.bNameController.text,
+          "beneficiary_name": driverController.beneficiaryNameController.text,
           "email": driverController.emailController.text,
           "bank_account_number": driverController.accNumController.text,
           "ifsc_code": driverController.ifscController.text,
@@ -76,9 +74,7 @@ class _BankDetailsState extends State<BankDetails> {
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
         final accountId = responseData['account_id'];
-        log("message");
-        // await storeAccountIdInFirebase(accountId);
-        // routePage(accountId);
+
         await Get.to(() => OtpScreen(widget.countryCode + widget.phoneNumber, accountId));
 
       } else {
@@ -90,18 +86,6 @@ class _BankDetailsState extends State<BankDetails> {
       authController.validSnackBar("An error occurred: $e");
     }
   }
-
-  // routePage(String accountId) async {
-    // showDialog(
-    //   context: context,
-    //   barrierDismissible: false,
-    //   builder: (BuildContext c) {
-    //     return ProgressDialog(message: "Processing, Please wait...");
-    //   },
-    // );
-    // await Future.delayed(Duration(seconds: 2));
-    // Navigator.pop(context);
-  // }
 
   Future<void> getImage(ImageSource source, Function(File) onSelected) async {
     try {
@@ -173,14 +157,14 @@ class _BankDetailsState extends State<BankDetails> {
             ),
             const SizedBox(height: 20),
             formField(
-              controller: driverController.bNameController,
-              "Enter Your Bank Name",
+              controller: driverController.beneficiaryNameController,
+              "Your Name As Per Bank Account",
               Icons.account_balance_outlined,
             ),
             const SizedBox(height: 20),
             formField(
               controller: driverController.ifscController,
-              "IFSC Number",
+              "IFSC Code",
               Icons.numbers,
               capital: true,
             ),

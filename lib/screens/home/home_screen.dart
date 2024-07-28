@@ -1,19 +1,16 @@
 import 'dart:async';
-import 'dart:developer';
-
 import 'package:easy_go_partner/consts/firebase_consts.dart';
 import 'package:easy_go_partner/ride/request_detail.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
+import 'package:geolocator/geolocator.dart' as geo;
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:location/location.dart';
 import 'package:page_transition/page_transition.dart';
-
 import '../../assistants/assistantsMethod.dart';
 import '../../controller/driver_controller.dart';
 import '../../dataHandler/appData.dart';
-import '../../model/address.dart';
 import '../../widget/custom_widget.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -23,7 +20,7 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   DriverController driverController = Get.put(DriverController());
   TextEditingController currentLocController = TextEditingController();
   DatabaseReference database = FirebaseDatabase.instance.ref();
@@ -33,14 +30,16 @@ class _HomeScreenState extends State<HomeScreen> {
   bool isVerified = false;
   bool isLoading = true;
   GoogleMapController? newMapController;
-  Position? currentLocation;
+  geo.Position? currentLocation;
   StreamSubscription<DatabaseEvent>? verificationStatusSubscription;
+  StreamSubscription<LocationData>? locationSubscription;
 
   // StreamSubscription<DatabaseEvent>? onlineStatusSubscription;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     Future.microtask(() async {
       String? vType = await getVehicleType();
       driverController.getRideRequests(vType);
@@ -50,11 +49,20 @@ class _HomeScreenState extends State<HomeScreen> {
     isVerified =
         false; // Initialize with false until verification status is fetched
     isLoading = true;
+
+    if (isOnline) {
+      startLocationUpdates();
+    }
+
   }
+
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     verificationStatusSubscription?.cancel();
+    // stopForegroundService();
+    locationSubscription?.cancel();
     super.dispose();
   }
 
@@ -168,8 +176,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> locatePosition() async {
     try {
-      Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
+      geo.Position position = await geo.Geolocator.getCurrentPosition(
+        desiredAccuracy: geo.LocationAccuracy.high,
       );
 
       setState(() {
@@ -204,6 +212,79 @@ class _HomeScreenState extends State<HomeScreen> {
       throw e; // Re-throw the error to propagate it further if needed
     }
   }
+
+  void startLocationUpdates() {
+    locationSubscription?.cancel(); // Cancel any existing subscription
+    Location location = Location();
+    locationSubscription =
+        location.onLocationChanged.listen((LocationData currentLocation) {
+      updateDriverLocationForAllPendingRides(currentLocation);
+    });
+    location.enableBackgroundMode(enable: true);
+  }
+
+  //
+  void updateDriverLocationForAllPendingRides(
+      LocationData currentLocation) async {
+    if (currentUser == null) {
+      print("User is not logged in");
+      return;
+    }
+
+    DatabaseReference rideRequestRef =
+        FirebaseDatabase.instance.ref().child('Ride Request');
+
+    // Fetch all ride requests where driver_id is equal to currentUserId and status is 'pending'
+    rideRequestRef
+        .orderByChild('driver_id')
+        .equalTo(currentUser!.uid)
+        .once()
+        .then((DatabaseEvent event) {
+      if (event.snapshot.exists) {
+        Map<String, dynamic> rides =
+            Map<String, dynamic>.from(event.snapshot.value as Map);
+
+        rides.forEach((key, value) {
+          Map<String, dynamic> rideData = Map<String, dynamic>.from(value);
+          if (rideData['status'] == 'pending') {
+            DatabaseReference rideRequestRef = FirebaseDatabase.instance
+                .ref()
+                .child('Ride Request')
+                .child(key);
+
+            rideRequestRef.update({
+              'd_location': {
+                'latitude': currentLocation.latitude.toString(),
+                'longitude': currentLocation.longitude.toString(),
+              },
+            });
+            // print(rideRequestRef.key);
+          }
+        });
+      } else {
+        // print('No pending rides found for the current user.');
+      }
+    });
+  }
+
+  // void updateDriverLocationInBackground(LocationData location) async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   String? rideRequestId = prefs.getString('rideRequestId');
+  //
+  //   if (rideRequestId != null) {
+  //     DatabaseReference rideRequestRef = FirebaseDatabase.instance
+  //         .ref()
+  //         .child('Ride Request')
+  //         .child(rideRequestId);
+  //
+  //     rideRequestRef.update({
+  //       'd_location': {
+  //         'latitude': location.latitude.toString(),
+  //         'longitude': location.longitude.toString(),
+  //       },
+  //     });
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -446,5 +527,36 @@ class _HomeScreenState extends State<HomeScreen> {
       'd_location': currentLocMap,
       'driver_id': currentUser!.uid,
     });
+
+    // SharedPreferences prefs = await SharedPreferences.getInstance();
+    // await prefs.setString('rideRequestId', rideRequestId);
+
+    // FlutterForegroundTask.startService(
+    //   notificationTitle: "Tracking Driver Location",
+    //   notificationText: "Your location is being tracked for the ride request.",
+    // );
+    updateDriverLocation(rideRequestId);
+    // startLocationUpdates();
+    // bg.BackgroundGeolocation.start();
+  }
+
+
+  void updateDriverLocation(String rideRequestId) {
+    Location location = Location();
+
+    location.onLocationChanged.listen((LocationData currentLocation) {
+      DatabaseReference rideRequestRef = FirebaseDatabase.instance
+          .ref()
+          .child('Ride Request')
+          .child(rideRequestId); // Ensure you have the rideRequestId
+
+      rideRequestRef.update({
+        'd_location': {
+          'latitude': currentLocation.latitude.toString(),
+          'longitude': currentLocation.longitude.toString(),
+        },
+      });
+    });
   }
 }
+

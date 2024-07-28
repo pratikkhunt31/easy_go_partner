@@ -5,7 +5,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-
 import 'controller/driver_controller.dart';
 import 'network_dependency.dart';
 
@@ -24,6 +23,8 @@ void main() async {
   runApp(const MyApp());
   DependencyInjection.init();
 }
+
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

@@ -33,7 +33,6 @@ class _PendingRideDetailsState extends State<PendingRideDetails> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     isRideStarted = widget.ride.isStarted;
     Future.microtask(() {
@@ -46,9 +45,11 @@ class _PendingRideDetailsState extends State<PendingRideDetails> {
       getPlaceDirection();
       Future.delayed(Duration(seconds: 3), () {
         // Navigator.of(context).pop(); // Dismiss the dialog
-        setState(() {
-          isLoading = false; // Set isLoading to false after loading is done
-        });
+        if (mounted) {
+          setState(() {
+            isLoading = false; // Set isLoading to false after loading is done
+          });
+        }
       });
     });
   }
@@ -78,13 +79,17 @@ class _PendingRideDetailsState extends State<PendingRideDetails> {
       'is_started': true,
     });
 
-    setState(() {
-      isRideStarted = true;
-    });
+    if (mounted) {
+      setState(() {
+        isRideStarted = true;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final height = MediaQuery.of(context).size.height;
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Ride Details"),
@@ -161,6 +166,24 @@ class _PendingRideDetailsState extends State<PendingRideDetails> {
                             children: [
                               SizedBox(height: 10),
                               Text(
+                                "* Do not close the App after accepting the Request",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.red,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: height * 0.009),
+                        Padding(
+                          padding: EdgeInsets.only(left: 12.0, right: 8.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              SizedBox(height: 10),
+                              Text(
                                 "Contact Details",
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
@@ -170,7 +193,7 @@ class _PendingRideDetailsState extends State<PendingRideDetails> {
                             ],
                           ),
                         ),
-                        SizedBox(height: 8),
+                        SizedBox(height: height * 0.009),
                         Padding(
                           padding: EdgeInsets.only(left: 8.0, right: 8.0),
                           child: isLoading
@@ -184,23 +207,7 @@ class _PendingRideDetailsState extends State<PendingRideDetails> {
                                   ),
                                 ),
                         ),
-                        SizedBox(height: 8),
-                        // Padding(
-                        //   padding: EdgeInsets.only(left: 12.0, right: 8.0),
-                        //   child: Row(
-                        //     mainAxisAlignment: MainAxisAlignment.start,
-                        //     children: [
-                        //       Text(
-                        //         "Fare Summary",
-                        //         style: TextStyle(
-                        //           fontWeight: FontWeight.bold,
-                        //           fontSize: 16,
-                        //         ),
-                        //       ),
-                        //     ],
-                        //   ),
-                        // ),
-                        // SizedBox(height: 8),
+                        SizedBox(height: height * 0.009),
                         Padding(
                           padding: const EdgeInsets.only(left: 8.0, right: 8.0),
                           child: isLoading
@@ -231,7 +238,7 @@ class _PendingRideDetailsState extends State<PendingRideDetails> {
                                             Text("${widget.ride.distance}"),
                                           ],
                                         ),
-                                        const SizedBox(height: 8),
+                                        SizedBox(height: height * 0.009),
                                         Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceBetween,
@@ -240,7 +247,7 @@ class _PendingRideDetailsState extends State<PendingRideDetails> {
                                             Text("${widget.ride.amount}"),
                                           ],
                                         ),
-                                        const SizedBox(height: 8),
+                                        SizedBox(height: height * 0.009),
                                         Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceBetween,
@@ -249,7 +256,7 @@ class _PendingRideDetailsState extends State<PendingRideDetails> {
                                             Text("${widget.ride.amount}"),
                                           ],
                                         ),
-                                        const SizedBox(height: 8),
+                                        SizedBox(height: height * 0.009),
                                         Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceBetween,
@@ -272,7 +279,7 @@ class _PendingRideDetailsState extends State<PendingRideDetails> {
                                   ),
                                 ),
                         ),
-                        SizedBox(height: 8),
+                        SizedBox(height: height * 0.009),
                         Padding(
                           padding: const EdgeInsets.only(left: 8.0, right: 8.0),
                           child: isLoading
@@ -303,7 +310,7 @@ class _PendingRideDetailsState extends State<PendingRideDetails> {
                                             ),
                                           ],
                                         ),
-                                        const SizedBox(height: 8),
+                                        SizedBox(height: height * 0.009),
 
                                         // const SizedBox(height: 8),
                                       ],
@@ -311,7 +318,7 @@ class _PendingRideDetailsState extends State<PendingRideDetails> {
                                   ),
                                 ),
                         ),
-                        SizedBox(height: 8),
+                        SizedBox(height: height * 0.009),
                         Padding(
                           padding: const EdgeInsets.only(left: 8.0, right: 8.0),
                           child: isLoading
@@ -350,7 +357,7 @@ class _PendingRideDetailsState extends State<PendingRideDetails> {
                                   ),
                                 ),
                         ),
-                        SizedBox(height: 80),
+                        SizedBox(height: height * 0.11),
                       ],
                     ),
                   ),
@@ -369,13 +376,7 @@ class _PendingRideDetailsState extends State<PendingRideDetails> {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(10),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black26,
-                      blurRadius: 10,
-                      offset: Offset(0, 2),
-                    ),
-                  ],
+
                 ),
                 child: isLoading
                     ? Shimmer.fromColors(
@@ -411,16 +412,13 @@ class _PendingRideDetailsState extends State<PendingRideDetails> {
     var initialPos = widget.ride.pickUpLatLng;
     var finalPos = widget.ride.dropOffLatLng;
 
-    var pickUpLatLng = LatLng(initialPos.latitude!, initialPos.longitude!);
-    var dropOffLatLng = LatLng(finalPos.latitude!, finalPos.longitude!);
+    var pickUpLatLng = LatLng(initialPos.latitude, initialPos.longitude);
+    var dropOffLatLng = LatLng(finalPos.latitude, finalPos.longitude);
 
     var details = await AssistantsMethod.obtainPlaceDirectionDirection(
         pickUpLatLng, dropOffLatLng);
 
     if (details != null) {
-      // Navigator.pop(context);
-
-      // print("This is Encoded Points: ${details.encodedPoint}");
       print(details.encodedPoint);
 
       PolylinePoints polylinePoints = PolylinePoints();

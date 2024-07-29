@@ -92,7 +92,7 @@ class AuthController extends GetxController {
   Future<void> verifyRideOtp(String otpCode) async {
     try {
       PhoneAuthCredential credential = PhoneAuthProvider.credential(
-          verificationId: verId!, smsCode: otpCode);
+          verificationId: verId, smsCode: otpCode);
       // Simulate verification by catching any errors during credential creation
       if (credential.smsCode == otpCode) {
         // OTP is verified successfully

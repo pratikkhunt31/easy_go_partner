@@ -456,19 +456,6 @@ class ContactDetailCard extends StatelessWidget {
     required this.receiverPhone,
   }) : super(key: key);
 
-  // void _launchCaller(String phoneNumber) async {
-  //   final Uri url = Uri(
-  //     scheme: 'tel',
-  //     path: phoneNumber,
-  //   );
-  //   // await canLaunchUrl(url);
-  //   if (await canLaunchUrl(url)) {
-  //     await launchUrl(url);
-  //   } else {
-  //     throw 'Could not launch $url';
-  //   }
-  // }
-
   Uri dialNumber = Uri(scheme: 'tel', path: '9558624406');
 
   @override

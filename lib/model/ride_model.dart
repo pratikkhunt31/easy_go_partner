@@ -16,23 +16,26 @@ class Ride {
   final LatLng pickUpLatLng;
   final LatLng dropOffLatLng;
   final String goods;
+  final String createdAt;
 
-  Ride(
-      {required this.rideId,
-      required this.dropOffAddress,
-      required this.pickUpAddress,
-      required this.senderName,
-      required this.senderPhone,
-      required this.receiverName,
-      required this.receiverPhone,
-      required this.amount,
-      required this.distance,
-      required this.time,
-        required this.payment,
-      required this.isStarted,
-      required this.pickUpLatLng,
-      required this.dropOffLatLng,
-      required this.goods});
+  Ride({
+    required this.rideId,
+    required this.dropOffAddress,
+    required this.pickUpAddress,
+    required this.senderName,
+    required this.senderPhone,
+    required this.receiverName,
+    required this.receiverPhone,
+    required this.amount,
+    required this.distance,
+    required this.time,
+    required this.payment,
+    required this.isStarted,
+    required this.pickUpLatLng,
+    required this.dropOffLatLng,
+    required this.goods,
+    required this.createdAt,
+  });
 
   factory Ride.fromMap(String rideRequestId, Map<String, dynamic> data) {
     return Ride(
@@ -57,28 +60,7 @@ class Ride {
         double.parse(data['dropOff']['longitude']),
       ),
       goods: data['goods'],
-    );
-  }
-}
-
-class Payment {
-  final String paymentStatus;
-  final String orderId;
-  final String paymentId;
-  final String status;
-
-  Payment(
-      {required this.paymentStatus,
-      required this.orderId,
-      required this.paymentId,
-      required this.status});
-
-  factory Payment.fromMap(Map<String, dynamic> data) {
-    return Payment(
-      paymentStatus: data['payment_status'],
-      orderId: data['paymentDetails']['orderId'],
-      paymentId: data['paymentDetails']['paymentId'],
-      status: data['paymentDetails']['status'],
+      createdAt: data['created_at'] ?? '',
     );
   }
 }

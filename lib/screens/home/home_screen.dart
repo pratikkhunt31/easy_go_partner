@@ -4,6 +4,7 @@ import 'package:easy_go_partner/ride/request_detail.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart' as geo;
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
@@ -20,7 +21,7 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
+class _HomeScreenState extends State<HomeScreen> {
   DriverController driverController = Get.put(DriverController());
   TextEditingController currentLocController = TextEditingController();
   DatabaseReference database = FirebaseDatabase.instance.ref();
@@ -34,18 +35,16 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   StreamSubscription<DatabaseEvent>? verificationStatusSubscription;
   StreamSubscription<LocationData>? locationSubscription;
 
-  // StreamSubscription<DatabaseEvent>? onlineStatusSubscription;
-
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
     Future.microtask(() async {
       String? vType = await getVehicleType();
       driverController.getRideRequests(vType);
     });
     loadUserData();
     fetchDriverVerificationStatus();
+    checkLocationPermission();
     isVerified =
         false; // Initialize with false until verification status is fetched
     isLoading = true;
@@ -53,17 +52,31 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     if (isOnline) {
       startLocationUpdates();
     }
-
   }
-
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
     verificationStatusSubscription?.cancel();
-    // stopForegroundService();
     locationSubscription?.cancel();
     super.dispose();
+  }
+
+  void checkLocationPermission() async {
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied ||
+        permission == LocationPermission.deniedForever) {
+      // Request location permissions if not granted or permanently denied
+      permission = await Geolocator.requestPermission();
+      if (permission != LocationPermission.whileInUse &&
+          permission != LocationPermission.always) {
+        // Handle the case where the user denies or permanently denies permission
+        validSnackBar('You have to enable location permission');
+      } else {
+        // locatePosition();
+      }
+    } else {
+      // locatePosition();
+    }
   }
 
   Future<String?> getVehicleType() async {
@@ -180,9 +193,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         desiredAccuracy: geo.LocationAccuracy.high,
       );
 
-      setState(() {
-        currentLocation = position;
-      });
+      if (mounted) {
+        setState(() {
+          currentLocation = position;
+        });
+      }
 
       LatLng latLngPosition = LatLng(position.latitude, position.longitude);
 
@@ -197,10 +212,11 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
       String address = await AssistantsMethod.searchCurrentAddress(position);
 
-      setState(() {
-        currentLocController.text = address;
-      });
-
+      if (mounted) {
+        setState(() {
+          currentLocController.text = address;
+        });
+      }
       // appData.updateDropOffLocationAddress(Address(
       //   placeName: address,
       //   latitude: position.latitude,
@@ -220,12 +236,12 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         location.onLocationChanged.listen((LocationData currentLocation) {
       updateDriverLocationForAllPendingRides(currentLocation);
     });
-    location.enableBackgroundMode(enable: true);
+    if (!mounted) {
+      location.enableBackgroundMode(enable: true);
+    }
   }
 
-  //
-  void updateDriverLocationForAllPendingRides(
-      LocationData currentLocation) async {
+  void updateDriverLocationForAllPendingRides(LocationData currentLocation) async {
     if (currentUser == null) {
       print("User is not logged in");
       return;
@@ -267,249 +283,265 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     });
   }
 
-  // void updateDriverLocationInBackground(LocationData location) async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   String? rideRequestId = prefs.getString('rideRequestId');
-  //
-  //   if (rideRequestId != null) {
-  //     DatabaseReference rideRequestRef = FirebaseDatabase.instance
-  //         .ref()
-  //         .child('Ride Request')
-  //         .child(rideRequestId);
-  //
-  //     rideRequestRef.update({
-  //       'd_location': {
-  //         'latitude': location.latitude.toString(),
-  //         'longitude': location.longitude.toString(),
-  //       },
-  //     });
-  //   }
-  // }
-
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
-      return Scaffold(
-        appBar: AppBar(
-          title: const Text("Ride Request"),
-          backgroundColor: const Color(0xFF0000FF),
-          elevation: 0,
-        ),
-        body: Center(
-          child: CircularProgressIndicator(
-            color: Color(0xFF0000FF),
-          ),
-        ),
-      );
-    }
-    if (!isVerified) {
-      return Scaffold(
-        appBar: AppBar(
-          title: const Text("Ride Request"),
-          backgroundColor: const Color(0xFF0000FF),
-          elevation: 0,
-          actions: [
-            Switch(
-              value: isOnline,
-              onChanged: (value) {},
-              activeColor: Colors.green,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        double screenWidth = constraints.maxWidth;
+        double screenHeight = constraints.maxHeight;
+        double iconSize = screenWidth * 0.14;
+        double fontSize = screenWidth * 0.04;
+
+        if (isLoading) {
+          return Scaffold(
+            appBar: AppBar(
+              title: const Text("Ride Request"),
+              backgroundColor: const Color(0xFF0000FF),
+              elevation: 0,
             ),
-          ],
-        ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.remove_red_eye_sharp, size: 50),
-              SizedBox(height: 10),
-              Text("Your application is under review"),
-            ],
-          ),
-        ),
-      );
-    }
-    return Scaffold(
-        appBar: isVerified
-            ? AppBar(
-                title: const Text("Ride Request"),
-                backgroundColor: const Color(0xFF0000FF),
-                elevation: 0,
-                actions: [
-                  Switch(
-                    value: isOnline,
-                    onChanged: (value) {
-                      if (value) {
-                        updateOnlineStatus(true);
-                      } else {
-                        showOfflineConfirmation();
-                      }
-                    },
-                    activeColor: Colors.green,
+            body: Center(
+              child: CircularProgressIndicator(
+                color: Color(0xFF0000FF),
+              ),
+            ),
+          );
+        }
+        if (!isVerified) {
+          return Scaffold(
+            appBar: AppBar(
+              title: const Text("Ride Request"),
+              backgroundColor: const Color(0xFF0000FF),
+              elevation: 0,
+              actions: [
+                Switch(
+                  value: isOnline,
+                  onChanged: (value) {},
+                  activeColor: Colors.green,
+                ),
+              ],
+            ),
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.remove_red_eye_sharp, size: iconSize),
+                  SizedBox(height: screenHeight * 0.01),
+                  Text(
+                    "Your application is under review",
+                    style: TextStyle(fontSize: fontSize),
                   ),
                 ],
-              )
-            : AppBar(
-                title: const Text("Ride Request"),
-                backgroundColor: const Color(0xFF0000FF),
-                elevation: 0,
               ),
-        body: isOnline
-            ? Obx(() {
-                if (driverController.rideRequests.isEmpty) {
-                  return FutureBuilder(
-                    future: Future.delayed(Duration(seconds: 1)),
-                    // Simulate a short loading period
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Center(
-                            child: CircularProgressIndicator(
+            ),
+          );
+        }
+        return Scaffold(
+          appBar: isVerified
+              ? AppBar(
+            title: const Text("Ride Request"),
+            backgroundColor: const Color(0xFF0000FF),
+            elevation: 0,
+            actions: [
+              Switch(
+                value: isOnline,
+                onChanged: (value) {
+                  if (value) {
+                    updateOnlineStatus(true);
+                  } else {
+                    showOfflineConfirmation();
+                  }
+                },
+                activeColor: Colors.green,
+              ),
+            ],
+          )
+              : AppBar(
+            title: const Text("Ride Request"),
+            backgroundColor: const Color(0xFF0000FF),
+            elevation: 0,
+          ),
+          body: isOnline
+              ? Obx(() {
+            if (driverController.rideRequests.isEmpty) {
+              return FutureBuilder(
+                future: Future.delayed(Duration(seconds: 1)),
+                // Simulate a short loading period
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(
+                        child: CircularProgressIndicator(
                           color: Color(0xFF0000FF),
                         ));
-                      } else {
-                        return Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.error_outline, size: 50),
-                              SizedBox(height: 20),
-                              Text("No Request Available"),
-                            ],
+                  } else {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.error_outline, size: iconSize),
+                          SizedBox(height: screenHeight * 0.02),
+                          Text(
+                            "No Request Available",
+                            style: TextStyle(fontSize: fontSize),
                           ),
-                        );
-                      }
-                    },
-                  );
-                }
-                return ListView.builder(
-                  itemCount: driverController.rideRequests.length,
-                  itemBuilder: (context, index) {
-                    var rideRequest = driverController.rideRequests[index];
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 8.0),
-                      child: Card(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            ListTile(
-                              leading: Image.asset('assets/images/truck2.png',
-                                  width: 50, height: 50),
-                              title: Text(rideRequest['created_at']),
-                              trailing: IconButton(
-                                icon: Icon(
-                                  Icons.arrow_forward,
-                                  color: Color(0xFF0000FF),
-                                ),
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    PageTransition(
-                                      child: RequestDetail(data: rideRequest),
-                                      type: PageTransitionType.bottomToTop,
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                            const Divider(height: 1.0, thickness: 1.0),
-                            const SizedBox(height: 5),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 25.0),
-                              child: Row(
-                                children: [
-                                  Text("From: "),
-                                  SizedBox(width: 5),
-                                  Expanded(
-                                    child: Text(rideRequest['pickUp_address']),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 25.0),
-                              child: Row(
-                                children: [
-                                  Text("To: "),
-                                  SizedBox(width: 22),
-                                  Expanded(
-                                    child: Text(rideRequest['dropOff_address']),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(height: 5),
-                            Center(
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.green,
-                                ),
-                                onPressed: () async {
-                                  // Add accept request logic here
-                                  showDialog(
-                                    context: context,
-                                    barrierDismissible: false,
-                                    builder: (BuildContext context) {
-                                      return ProgressDialog(
-                                          message: "Request Accepting");
-                                    },
-                                  );
-                                  try {
-                                    await locatePosition();
-                                    acceptRideRequest(
-                                        rideRequest['rideRequestId']);
-                                    Navigator.pop(
-                                        context); // Close the progress dialog
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text('Request accepted'),
-                                        backgroundColor: Colors.green,
-                                      ),
-                                    );
-                                  } catch (e) {
-                                    Navigator.pop(
-                                        context); // Close the progress dialog
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text('Try again'),
-                                        backgroundColor: Colors.red,
-                                      ),
-                                    );
-                                  }
-                                },
-                                child: Text("Accept"),
-                              ),
-                            ),
-                          ],
-                        ),
+                        ],
                       ),
                     );
-                  },
+                  }
+                },
+              );
+            }
+            return ListView.builder(
+              itemCount: driverController.rideRequests.length,
+              itemBuilder: (context, index) {
+                var rideRequest = driverController.rideRequests[index];
+                return Padding(
+                  padding: EdgeInsets.only(bottom: screenHeight * 0.01),
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        PageTransition(
+                          child: RequestDetail(data: rideRequest),
+                          type: PageTransitionType.bottomToTop,
+                        ),
+                      );
+                    },
+                    child: Card(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ListTile(
+                            leading: Image.asset(
+                              'assets/images/truck2.png',
+                              width: iconSize,
+                              height: iconSize,
+                            ),
+                            title: Text(
+                              rideRequest['created_at'],
+                              style: TextStyle(fontSize: fontSize),
+                            ),
+                            trailing: Text(
+                              rideRequest['payout'],
+                              style: TextStyle(
+                                fontSize: fontSize,
+                                color: Color(0xFF0000FF),
+                              ),
+                            ),
+                          ),
+                          const Divider(height: 1.0, thickness: 1.0),
+                          const SizedBox(height: 5),
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: screenWidth * 0.05),
+                            child: Row(
+                              children: [
+                                Text(
+                                  "From: ",
+                                  style: TextStyle(fontSize: fontSize),
+                                ),
+                                SizedBox(width: screenWidth * 0.01),
+                                Expanded(
+                                  child: Text(
+                                    rideRequest['pickUp_address'],
+                                    style: TextStyle(fontSize: fontSize),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: screenWidth * 0.05),
+                            child: Row(
+                              children: [
+                                Text(
+                                  "To: ",
+                                  style: TextStyle(fontSize: fontSize),
+                                ),
+                                SizedBox(width: screenWidth * 0.06),
+                                Expanded(
+                                  child: Text(
+                                    rideRequest['dropOff_address'],
+                                    style: TextStyle(fontSize: fontSize),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          Center(
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.green,
+                              ),
+                              onPressed: () async {
+                                // Add accept request logic here
+                                showDialog(
+                                  context: context,
+                                  barrierDismissible: false,
+                                  builder: (BuildContext context) {
+                                    return ProgressDialog(
+                                        message: "Request Accepting");
+                                  },
+                                );
+                                try {
+                                  await locatePosition();
+                                  acceptRideRequest(
+                                      rideRequest['rideRequestId']);
+                                  Navigator.pop(
+                                      context); // Close the progress dialog
+                                  ScaffoldMessenger.of(context)
+                                      .showSnackBar(
+                                    SnackBar(
+                                      content: Text('Request accepted'),
+                                      backgroundColor: Colors.green,
+                                    ),
+                                  );
+                                } catch (e) {
+                                  Navigator.pop(
+                                      context); // Close the progress dialog
+                                  ScaffoldMessenger.of(context)
+                                      .showSnackBar(
+                                    SnackBar(
+                                      content: Text('Try again'),
+                                      backgroundColor: Colors.red,
+                                    ),
+                                  );
+                                }
+                              },
+                              child: Text(
+                                "Accept",
+                                style: TextStyle(fontSize: fontSize),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 );
-              })
-            : Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.cloud_off_sharp, size: 50),
-                    SizedBox(height: 10),
-                    Text("You're offline"),
-                  ],
+              },
+            );
+          })
+              : Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.cloud_off_sharp, size: iconSize),
+                SizedBox(height: screenHeight * 0.01),
+                Text(
+                  "You're offline",
+                  style: TextStyle(fontSize: fontSize),
                 ),
-              )
-        // : Center(
-        //     child: Column(
-        //       mainAxisAlignment: MainAxisAlignment.center,
-        //       children: [
-        //         Icon(Icons.remove_red_eye_sharp, size: 50),
-        //         SizedBox(height: 10),
-        //         Text("Your application is under review"),
-        //       ],
-        //     ),
-        //   ),
+              ],
+            ),
+          ),
         );
+      },
+    );
   }
+
 
   Future<void> acceptRideRequest(String rideRequestId) async {
     var pickUp = appData.currentLocation;
@@ -528,18 +560,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       'driver_id': currentUser!.uid,
     });
 
-    // SharedPreferences prefs = await SharedPreferences.getInstance();
-    // await prefs.setString('rideRequestId', rideRequestId);
-
-    // FlutterForegroundTask.startService(
-    //   notificationTitle: "Tracking Driver Location",
-    //   notificationText: "Your location is being tracked for the ride request.",
-    // );
     updateDriverLocation(rideRequestId);
-    // startLocationUpdates();
-    // bg.BackgroundGeolocation.start();
   }
-
 
   void updateDriverLocation(String rideRequestId) {
     Location location = Location();
@@ -559,4 +581,3 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     });
   }
 }
-

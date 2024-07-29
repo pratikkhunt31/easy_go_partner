@@ -1,5 +1,5 @@
 import 'package:easy_go_partner/screens/profile/edit_bank.dart';
-import 'package:easy_go_partner/screens/profile/t&c.dart';
+import 'package:easy_go_partner/screens/profile/privacy.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -68,6 +68,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     AuthController authController = Get.put(AuthController());
+    final height = MediaQuery.of(context).size.height;
 
     return Scaffold(
       appBar: AppBar(
@@ -93,16 +94,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // const Text(
-                    //   "Setting",
-                    //   style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
-                    // ),
-                    // const SizedBox(height: 10),
-                    // const Text(
-                    //   "Account",
-                    //   style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
-                    // ),
-                    // const SizedBox(height: 20),
                     SizedBox(
                       width: double.infinity,
                       child: Row(
@@ -139,7 +130,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
-                              SizedBox(height: 3),
+                              SizedBox(height: height*0.003),
                               Text(
                                 "Personal Info",
                                 style: TextStyle(
@@ -164,7 +155,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    SizedBox(height: height*0.023),
                     const Text(
                       "Settings",
                       style: TextStyle(
@@ -172,16 +163,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    // const SizedBox(height: 20),
-                    // SettingItem(
-                    //   title: "Language",
-                    //   value: "Gujarati",
-                    //   icon: Ionicons.earth,
-                    //   bgColor: Colors.orange.shade100,
-                    //   iconColor: Colors.orange,
-                    //   onTap: () {},
-                    // ),
-                    const SizedBox(height: 20),
+                    SizedBox(height: height*0.023),
                     SettingItem(
                       title: "Bank Details",
                       icon: Ionicons.receipt_sharp,
@@ -197,9 +179,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         );
                       },
                     ),
-                    const SizedBox(height: 20),
+                    SizedBox(height: height*0.023),
                     SettingItem(
-                      title: "Terms & Condition",
+                      title: "Privacy Policy",
                       icon: Ionicons.text,
                       bgColor: Colors.blue.shade100,
                       iconColor: Colors.blue,
@@ -207,13 +189,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         Navigator.push(
                           context,
                           PageTransition(
-                            child: TermsConditionsPage(),
+                            child: PrivacyPolicy(),
                             type: PageTransitionType.bottomToTop,
                           ),
                         );
                       },
                     ),
-                    const SizedBox(height: 20),
+                    SizedBox(height: height*0.023),
                     SettingItem(
                       title: "Help & Support",
                       icon: Ionicons.help,
@@ -229,7 +211,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         );
                       },
                     ),
-                    const SizedBox(height: 20),
+                    SizedBox(height: height*0.023),
                     SettingItem(
                       title: "LogOut",
                       icon: Ionicons.log_out_sharp,
@@ -245,7 +227,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         }
                       },
                     ),
-                    const SizedBox(height: 20),
+                    SizedBox(height: height*0.023),
                     Center(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -262,7 +244,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             appVersion,
                             style: const TextStyle(
                               fontSize: 14,
-                              // fontWeight: FontWeight.bold,
                               color: Colors.grey,
                             ),
                           ),

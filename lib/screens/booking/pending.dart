@@ -1,11 +1,16 @@
+import 'dart:async';
+
 import 'package:easy_go_partner/consts/firebase_consts.dart';
 import 'package:easy_go_partner/ride/pending_ride_detail.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:intl/intl.dart';
+import 'package:location/location.dart';
 import 'package:page_transition/page_transition.dart';
 
 import '../../model/ride_model.dart';
+import '../../widget/custom_widget.dart';
 
 class Pending extends StatefulWidget {
   const Pending({super.key});
@@ -16,40 +21,123 @@ class Pending extends StatefulWidget {
 
 class _PendingState extends State<Pending> {
 
-  Stream<List<Ride>> getPendingRides() async* {
+  StreamSubscription<LocationData>? locationSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    // Call the method to check and request location permissions
+    checkLocationPermission();
+    startLocationUpdates();
+  }
+
+  void checkLocationPermission() async {
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied ||
+        permission == LocationPermission.deniedForever) {
+      permission = await Geolocator.requestPermission();
+      if (permission != LocationPermission.whileInUse &&
+          permission != LocationPermission.always) {
+        validSnackBar('You have to enable location permission');
+      } else {
+        // locatePosition();
+      }
+    } else {
+      // locatePosition();
+    }
+  }
+
+  void startLocationUpdates() {
+    locationSubscription?.cancel(); // Cancel any existing subscription
+    Location location = Location();
+    locationSubscription =
+        location.onLocationChanged.listen((LocationData currentLocation) {
+          updateDriverLocationForAllPendingRides(currentLocation);
+        });
+    if (!mounted) {
+      location.enableBackgroundMode(enable: true);
+    }
+  }
+
+  void updateDriverLocationForAllPendingRides(LocationData currentLocation) async {
     if (currentUser == null) {
       print("User is not logged in");
-      yield [];
       return;
     }
 
     DatabaseReference rideRequestRef =
-        FirebaseDatabase.instance.ref().child('Ride Request');
+    FirebaseDatabase.instance.ref().child('Ride Request');
 
-    yield* rideRequestRef
+    rideRequestRef
         .orderByChild('driver_id')
         .equalTo(currentUser!.uid)
-        .onValue
-        .map((event) {
+        .once()
+        .then((DatabaseEvent event) {
       if (event.snapshot.exists) {
         Map<String, dynamic> rides =
-            Map<String, dynamic>.from(event.snapshot.value as Map);
-        List<Ride> filteredRides = [];
+        Map<String, dynamic>.from(event.snapshot.value as Map);
 
         rides.forEach((key, value) {
           Map<String, dynamic> rideData = Map<String, dynamic>.from(value);
           if (rideData['status'] == 'pending') {
-            filteredRides.add(Ride.fromMap(key, rideData));
+            DatabaseReference rideRequestRef = FirebaseDatabase.instance
+                .ref()
+                .child('Ride Request')
+                .child(key);
+
+            rideRequestRef.update({
+              'd_location': {
+                'latitude': currentLocation.latitude.toString(),
+                'longitude': currentLocation.longitude.toString(),
+              },
+            });
+            // print(rideRequestRef.key);
           }
         });
-
-        return filteredRides;
       } else {
-        print('No rides found for the current user.');
-        return [];
+        // print('No pending rides found for the current user.');
       }
     });
   }
+
+  Stream<List<Ride>> getPendingRides() async* {
+      if (currentUser == null) {
+        print("User is not logged in");
+        yield [];
+        return;
+      }
+
+      DatabaseReference rideRequestRef =
+          FirebaseDatabase.instance.ref().child('Ride Request');
+
+      yield* rideRequestRef
+          .orderByChild('driver_id')
+          .equalTo(currentUser!.uid)
+          .onValue
+          .map((event) {
+        if (event.snapshot.exists) {
+          Map<String, dynamic> rides =
+              Map<String, dynamic>.from(event.snapshot.value as Map);
+          List<Ride> filteredRides = [];
+
+          rides.forEach((key, value) {
+            Map<String, dynamic> rideData = Map<String, dynamic>.from(value);
+            if (rideData['status'] == 'pending') {
+              filteredRides.add(Ride.fromMap(key, rideData));
+            }
+          });
+          filteredRides.sort((a, b) {
+            DateTime createdAtA = DateFormat('dd-MM-yyyy HH:mm:ss').parse(a.createdAt);
+            DateTime createdAtB = DateFormat('dd-MM-yyyy HH:mm:ss').parse(b.createdAt);
+            return createdAtB.compareTo(createdAtA); // Sort in descending order
+          });
+          return filteredRides;
+        } else {
+          print('No rides found for the current user.');
+          return [];
+        }
+      });
+    }
 
   @override
   Widget build(BuildContext context) {

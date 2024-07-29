@@ -1,10 +1,7 @@
 import 'dart:io';
 import 'dart:async';
 import 'package:easy_go_partner/controller/driver_controller.dart';
-import 'package:easy_go_partner/model/address.dart';
-import 'package:easy_go_partner/screens/home/home_view.dart';
 import 'package:easy_go_partner/screens/login/bank_details.dart';
-import 'package:easy_go_partner/screens/login/otp_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -28,27 +25,29 @@ class _LoginFormState extends State<LoginForm> {
   validate() async {
     if (driverController.nameController.text.isEmpty) {
       authController.validSnackBar("Name is not empty");
-    } else if (driverController.emailController.text.isEmpty) {
-      authController.validSnackBar("Email Address is not empty");
-    } else if (!driverController.emailController.text.contains("@gmail.com")) {
-      authController.validSnackBar("Email Address is not valid");
-    } else if (driverController.addressController.text.isEmpty) {
-      authController.validSnackBar("Address is not empty");
-    } else if (driverController.selectedVehicleNotifier.value == null) {
-      authController.validSnackBar("Vehicle-type is not empty");
-    } else if (driverController.rcNumController.text.isEmpty) {
-      authController.validSnackBar("RC-Number is not empty");
-    } else if (driverController.rcBookImg == null) {
-      authController.validSnackBar("Upload RC book image");
-    } else if (driverController.vNumController.text.isEmpty) {
-      authController.validSnackBar("Vehicle Number is not empty");
-    } else if (driverController.vehicleImages.length < 2) {
-      authController.validSnackBar("Upload vehicle images image");
-    } else if (driverController.dLController.text.isEmpty) {
-      authController.validSnackBar("DL-Number is not empty");
-    } else if (driverController.licenseImg == null) {
-      authController.validSnackBar("Upload License image");
-    } else {
+    }
+    // else if (driverController.emailController.text.isEmpty) {
+    //   authController.validSnackBar("Email Address is not empty");
+    // } else if (!driverController.emailController.text.contains("@gmail.com")) {
+    //   authController.validSnackBar("Email Address is not valid");
+    // } else if (driverController.addressController.text.isEmpty) {
+    //   authController.validSnackBar("Address is not empty");
+    // } else if (driverController.selectedVehicleNotifier.value == null) {
+    //   authController.validSnackBar("Vehicle-type is not empty");
+    // } else if (driverController.rcNumController.text.isEmpty) {
+    //   authController.validSnackBar("RC-Number is not empty");
+    // } else if (driverController.rcBookImg == null) {
+    //   authController.validSnackBar("Upload RC book image");
+    // } else if (driverController.vNumController.text.isEmpty) {
+    //   authController.validSnackBar("Vehicle Number is not empty");
+    // } else if (driverController.vehicleImages.length < 2) {
+    //   authController.validSnackBar("Upload vehicle images image");
+    // } else if (driverController.dLController.text.isEmpty) {
+    //   authController.validSnackBar("DL-Number is not empty");
+    // } else if (driverController.licenseImg == null) {
+    //   authController.validSnackBar("Upload License image");
+    // }
+    else {
       routePage();
     }
   }
@@ -159,37 +158,36 @@ class _LoginFormState extends State<LoginForm> {
 
   @override
   Widget build(BuildContext context) {
-    // print("${widget.countryCode}${widget.phoneNumber}");
-    final Size screenSize = MediaQuery.of(context).size;
-    final double screenHeight = screenSize.height;
-    final double screenWidth = screenSize.width;
-
     return Scaffold(
       appBar: AppBar(
         title: Text(
           "Register as a Driver",
-          // style: TextStyle(color: Colors.black),
+          style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.05),
         ),
         backgroundColor: const Color(0xFF0000FF),
         elevation: 0,
       ),
-      // backgroundColor: Colors.transparent,
       body: Container(
-        padding: EdgeInsets.only(right: 20.0, left: 20.0),
+        padding: EdgeInsets.symmetric(
+          horizontal: MediaQuery.of(context).size.width * 0.05,
+        ),
         child: ListView(
           children: [
-            const SizedBox(height: 10),
+            SizedBox(height: MediaQuery.of(context).size.height * 0.02),
             Text(
               "Let's create your account",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: MediaQuery.of(context).size.width * 0.045,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: MediaQuery.of(context).size.height * 0.02),
             formField(
               controller: driverController.nameController,
               "Enter Your Name",
               Icons.person_outline_sharp,
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: MediaQuery.of(context).size.height * 0.02),
             formField(
               "Mobile",
               Icons.phone,
@@ -197,25 +195,25 @@ class _LoginFormState extends State<LoginForm> {
               read: true,
               hint: widget.phoneNumber,
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: MediaQuery.of(context).size.height * 0.02),
             formField(
               controller: driverController.emailController,
               "Email",
               Icons.email_outlined,
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: MediaQuery.of(context).size.height * 0.02),
             formField(
               controller: driverController.addressController,
               "Address",
               Icons.home_outlined,
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: MediaQuery.of(context).size.height * 0.02),
             formField(
               controller: driverController.cityController,
               "City",
               Icons.location_city_outlined,
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: MediaQuery.of(context).size.height * 0.02),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -226,7 +224,7 @@ class _LoginFormState extends State<LoginForm> {
                     Icons.map_outlined,
                   ),
                 ),
-                SizedBox(width: 5),
+                SizedBox(width: MediaQuery.of(context).size.width * 0.02),
                 Expanded(
                   child: formField(
                     controller: driverController.pinCodeController,
@@ -237,7 +235,7 @@ class _LoginFormState extends State<LoginForm> {
                 ),
               ],
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: MediaQuery.of(context).size.height * 0.02),
             ValueListenableBuilder<String?>(
               valueListenable: driverController.selectedVehicleNotifier,
               builder: (context, selectedVehicle, child) {
@@ -260,86 +258,99 @@ class _LoginFormState extends State<LoginForm> {
                 );
               },
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: MediaQuery.of(context).size.height * 0.02),
             formField(
               controller: driverController.rcNumController,
               "RC-Number",
               Icons.numbers,
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: MediaQuery.of(context).size.height * 0.02),
             OutlinedButton.icon(
               onPressed: () => showImagePickerOptions(
-                  (file) => driverController.rcBookImg = file),
+                      (file) => driverController.rcBookImg = file),
               icon: Icon(Icons.add_photo_alternate_outlined),
               label: Text(
                 'Upload RC book Image',
-                style: TextStyle(fontSize: 15),
+                style: TextStyle(
+                  fontSize: MediaQuery.of(context).size.width * 0.04,
+                ),
               ),
               style: ButtonStyle(
                 backgroundColor:
-                    MaterialStateProperty.all<Color>(Colors.grey.shade300),
+                MaterialStateProperty.all<Color>(Colors.grey.shade300),
                 foregroundColor:
-                    MaterialStateProperty.all<Color>(Colors.black87),
+                MaterialStateProperty.all<Color>(Colors.black87),
                 side: MaterialStateProperty.all<BorderSide>(
                   BorderSide(color: Colors.grey.shade600),
                 ),
                 padding: MaterialStateProperty.all<EdgeInsets>(
-                  EdgeInsets.symmetric(vertical: 16.0),
+                  EdgeInsets.symmetric(
+                    vertical: MediaQuery.of(context).size.height * 0.02,
+                  ),
                 ),
               ),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: MediaQuery.of(context).size.height * 0.02),
             driverController.rcBookImg != null
                 ? Column(
-                    children: [
-                      Container(
-                        width: 150,
-                        child: Image.file(
-                          driverController.rcBookImg!,
-                          height: 150,
-                          fit: BoxFit.fill,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      ElevatedButton(
-                        style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.all<Color>(Colors.red),
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            driverController.rcBookImg = null;
-                          });
-                        },
-                        child: Text('Remove Image'),
-                      ),
-                    ],
-                  )
+              children: [
+                Container(
+                  width: MediaQuery.of(context).size.width * 0.4,
+                  child: Image.file(
+                    driverController.rcBookImg!,
+                    height: MediaQuery.of(context).size.width * 0.4,
+                    fit: BoxFit.fill,
+                  ),
+                ),
+                SizedBox(height: MediaQuery.of(context).size.height * 0.01),
+                ElevatedButton(
+                  style: ButtonStyle(
+                    backgroundColor:
+                    MaterialStateProperty.all<Color>(Colors.red),
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      driverController.rcBookImg = null;
+                    });
+                  },
+                  child: Text(
+                    'Remove Image',
+                    style: TextStyle(
+                      fontSize: MediaQuery.of(context).size.width * 0.035,
+                    ),
+                  ),
+                ),
+              ],
+            )
                 : Container(),
-            const SizedBox(height: 20),
+            SizedBox(height: MediaQuery.of(context).size.height * 0.01),
             formField(
               controller: driverController.vNumController,
               "Vehicle-Number",
               Icons.numbers,
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: MediaQuery.of(context).size.height * 0.02),
             OutlinedButton.icon(
               onPressed: showMultipleImagePickerOptions,
               icon: Icon(Icons.add_photo_alternate_outlined),
               label: Text(
                 'Upload Vehicle Image',
-                style: TextStyle(fontSize: 15),
+                style: TextStyle(
+                  fontSize: MediaQuery.of(context).size.width * 0.04,
+                ),
               ),
               style: ButtonStyle(
                 backgroundColor:
-                    MaterialStateProperty.all<Color>(Colors.grey.shade300),
+                MaterialStateProperty.all<Color>(Colors.grey.shade300),
                 foregroundColor:
-                    MaterialStateProperty.all<Color>(Colors.black87),
+                MaterialStateProperty.all<Color>(Colors.black87),
                 side: MaterialStateProperty.all<BorderSide>(
                   BorderSide(color: Colors.grey.shade600),
                 ),
                 padding: MaterialStateProperty.all<EdgeInsets>(
-                  EdgeInsets.symmetric(vertical: 16.0),
+                  EdgeInsets.symmetric(
+                    vertical: MediaQuery.of(context).size.height * 0.02,
+                  ),
                 ),
               ),
             ),
@@ -347,53 +358,61 @@ class _LoginFormState extends State<LoginForm> {
               alignment: Alignment.topLeft,
               child: Text(
                 "*Image should contain front and back side number plate",
-                style: TextStyle(color: Colors.grey, fontSize: 12),
+                style: TextStyle(
+                  color: Colors.grey,
+                  fontSize: MediaQuery.of(context).size.width * 0.03,
+                ),
               ),
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: MediaQuery.of(context).size.height * 0.01),
             driverController.vehicleImages.isNotEmpty
                 ? Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: driverController.vehicleImages.map((file) {
-                          return Column(
-                            children: [
-                              Container(
-                                width: 150,
-                                child: Image.file(
-                                  file,
-                                  height: 150,
-                                  fit: BoxFit.fill,
-                                ),
-                              ),
-                              const SizedBox(height: 10),
-                            ],
-                          );
-                        }).toList(),
-                      ),
-                      ElevatedButton(
-                        style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.all<Color>(Colors.red),
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: driverController.vehicleImages.map((file) {
+                    return Column(
+                      children: [
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.4,
+                          child: Image.file(
+                            file,
+                            height: MediaQuery.of(context).size.width * 0.4,
+                            fit: BoxFit.fill,
+                          ),
                         ),
-                        onPressed: () {
-                          setState(() {
-                            driverController.vehicleImages = List.empty();
-                          });
-                        },
-                        child: Text('Remove Image'),
-                      ),
-                    ],
-                  )
+                        SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                      ],
+                    );
+                  }).toList(),
+                ),
+                ElevatedButton(
+                  style: ButtonStyle(
+                    backgroundColor:
+                    MaterialStateProperty.all<Color>(Colors.red),
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      driverController.vehicleImages = List.empty();
+                    });
+                  },
+                  child: Text(
+                    'Remove Image',
+                    style: TextStyle(
+                      fontSize: MediaQuery.of(context).size.width * 0.035,
+                    ),
+                  ),
+                ),
+              ],
+            )
                 : Container(),
-            const SizedBox(height: 10),
+            SizedBox(height: MediaQuery.of(context).size.height * 0.01),
             formField(
               controller: driverController.dLController,
               "Driving License",
               Icons.directions_bike_sharp,
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: MediaQuery.of(context).size.height * 0.02),
             OutlinedButton.icon(
               onPressed: () => showImagePickerOptions((file) {
                 driverController.licenseImg = file;
@@ -401,74 +420,76 @@ class _LoginFormState extends State<LoginForm> {
               icon: Icon(Icons.add_photo_alternate_outlined),
               label: Text(
                 'Upload Driving License Image',
-                style: TextStyle(fontSize: 15),
+                style: TextStyle(
+                  fontSize: MediaQuery.of(context).size.width * 0.04,
+                ),
               ),
               style: ButtonStyle(
                 backgroundColor:
-                    MaterialStateProperty.all<Color>(Colors.grey.shade300),
+                MaterialStateProperty.all<Color>(Colors.grey.shade300),
                 foregroundColor:
-                    MaterialStateProperty.all<Color>(Colors.black87),
+                MaterialStateProperty.all<Color>(Colors.black87),
                 side: MaterialStateProperty.all<BorderSide>(
                   BorderSide(color: Colors.grey.shade600),
                 ),
                 padding: MaterialStateProperty.all<EdgeInsets>(
-                  EdgeInsets.symmetric(vertical: 16.0, horizontal: 24.0),
+                  EdgeInsets.symmetric(
+                    vertical: MediaQuery.of(context).size.height * 0.02,
+                    horizontal: MediaQuery.of(context).size.width * 0.05,
+                  ),
                 ),
               ),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: MediaQuery.of(context).size.height * 0.01),
             driverController.licenseImg != null
                 ? Column(
-                    children: [
-                      Container(
-                        width: 150,
-                        child: Image.file(
-                          driverController.licenseImg!,
-                          height: 150,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      ElevatedButton(
-                        style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.all<Color>(Colors.red),
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            driverController.licenseImg = null;
-                          });
-                        },
-                        child: Text('Remove Image'),
-                      ),
-                    ],
-                  )
+              children: [
+                Container(
+                  width: MediaQuery.of(context).size.width * 0.4,
+                  child: Image.file(
+                    driverController.licenseImg!,
+                    height: MediaQuery.of(context).size.width * 0.4,
+                    fit: BoxFit.fill,
+                  ),
+                ),
+                SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                ElevatedButton(
+                  style: ButtonStyle(
+                    backgroundColor:
+                    MaterialStateProperty.all<Color>(Colors.red),
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      driverController.licenseImg = null;
+                    });
+                  },
+                  child: Text(
+                    'Remove Image',
+                    style: TextStyle(
+                      fontSize: MediaQuery.of(context).size.width * 0.035,
+                    ),
+                  ),
+                ),
+              ],
+            )
                 : Container(),
-            const SizedBox(height: 10),
+            SizedBox(height: MediaQuery.of(context).size.height * 0.01),
             SizedBox(
               width: double.infinity,
               child: CustomButton(
                 hint: "Continue",
                 onPress: () {
                   validate();
-                  // driverController
-                  //     .registerUser(widget.countryCode + widget.phoneNumber);
-                  // Get.to(
-                  //   () => OtpScreen(
-                  //     widget.countryCode + widget.phoneNumber,
-                  //     driverController.nameController.text.trim(),
-                  //     driverController.emailController.text.trim(),
-                  //   ),
-                  // );
                 },
-                borderRadius: BorderRadius.circular(25.0),
+                borderRadius: BorderRadius.circular(5.0),
                 color: const Color(0xFF0000FF),
               ),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: MediaQuery.of(context).size.height * 0.02),
           ],
         ),
       ),
     );
   }
+
 }

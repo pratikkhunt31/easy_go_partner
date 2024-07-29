@@ -1,5 +1,4 @@
 
-import 'package:easy_go_partner/screens/booking/cancel.dart';
 import 'package:easy_go_partner/screens/booking/complete.dart';
 import 'package:easy_go_partner/screens/booking/pending.dart';
 import 'package:flutter/material.dart';

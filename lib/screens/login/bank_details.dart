@@ -1,4 +1,3 @@
-
 import 'dart:io';
 import 'dart:convert';
 import 'package:easy_go_partner/screens/login/otp_screen.dart';
@@ -15,7 +14,7 @@ class BankDetails extends StatefulWidget {
   final String countryCode;
   final String phoneNumber;
 
-    const BankDetails(this.countryCode, this.phoneNumber, {super.key});
+  const BankDetails(this.countryCode, this.phoneNumber, {super.key});
 
   @override
   State<BankDetails> createState() => _BankDetailsState();
@@ -75,8 +74,8 @@ class _BankDetailsState extends State<BankDetails> {
         final responseData = jsonDecode(response.body);
         final accountId = responseData['account_id'];
 
-        await Get.to(() => OtpScreen(widget.countryCode + widget.phoneNumber, accountId));
-
+        await Get.to(() =>
+            OtpScreen(widget.countryCode + widget.phoneNumber, accountId));
       } else {
         authController
             .validSnackBar("Failed to create account: ${response.body}");
@@ -133,6 +132,9 @@ class _BankDetailsState extends State<BankDetails> {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Register as a Driver"),
@@ -140,35 +142,36 @@ class _BankDetailsState extends State<BankDetails> {
         elevation: 0,
       ),
       body: Container(
-        padding: EdgeInsets.symmetric(horizontal: 20.0),
+        padding: EdgeInsets.symmetric(horizontal: width * 0.05),
         child: ListView(
           children: [
-            const SizedBox(height: 10),
+            SizedBox(height: height * 0.01),
             Text(
               "Fill your Bank Details",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                  fontSize: width * 0.05, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: height * 0.02),
             formField(
               controller: driverController.panController,
               "PAN Number",
               Icons.credit_card_outlined,
               capital: true,
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: height * 0.02),
             formField(
               controller: driverController.beneficiaryNameController,
               "Your Name As Per Bank Account",
               Icons.account_balance_outlined,
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: height * 0.02),
             formField(
               controller: driverController.ifscController,
               "IFSC Code",
               Icons.numbers,
               capital: true,
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: height * 0.02),
             formField(
               controller: driverController.accNumController,
               "Enter Account Number",
@@ -176,14 +179,14 @@ class _BankDetailsState extends State<BankDetails> {
               obscure: true,
               isNum: true,
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: height * 0.02),
             formField(
               controller: driverController.cAccNumController,
               "Re-Enter Account Number",
               Icons.repeat_outlined,
               isNum: true,
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: height * 0.02),
             OutlinedButton.icon(
               onPressed: () => showImagePickerOptions(
                   (file) => driverController.passBookImg = file),
@@ -201,7 +204,7 @@ class _BankDetailsState extends State<BankDetails> {
                   BorderSide(color: Colors.grey.shade600),
                 ),
                 padding: MaterialStateProperty.all<EdgeInsets>(
-                  EdgeInsets.symmetric(vertical: 16.0),
+                  EdgeInsets.symmetric(vertical: height * 0.018),
                 ),
               ),
             ),
@@ -209,10 +212,10 @@ class _BankDetailsState extends State<BankDetails> {
               alignment: Alignment.topLeft,
               child: Text(
                 "*Make sure that Account Number is clearly visible",
-                style: TextStyle(color: Colors.grey, fontSize: 12),
+                style: TextStyle(color: Colors.grey, fontSize: height * 0.015),
               ),
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: height * 0.01),
             driverController.passBookImg != null
                 ? Column(
                     children: [
@@ -224,7 +227,7 @@ class _BankDetailsState extends State<BankDetails> {
                           fit: BoxFit.fill,
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      SizedBox(height: height * 0.8),
                       ElevatedButton(
                         style: ButtonStyle(
                           backgroundColor:
@@ -240,20 +243,19 @@ class _BankDetailsState extends State<BankDetails> {
                     ],
                   )
                 : Container(),
-            const SizedBox(height: 20),
+            SizedBox(height: height * 0.02),
             SizedBox(
               width: double.infinity,
               child: CustomButton(
                 hint: "Continue",
-                onPress: () async{
-
+                onPress: () async {
                   validate();
                 },
-                borderRadius: BorderRadius.circular(25.0),
+                borderRadius: BorderRadius.circular(5.0),
                 color: const Color(0xFF0000FF),
               ),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: height * 0.02),
           ],
         ),
       ),

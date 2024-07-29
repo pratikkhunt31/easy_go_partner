@@ -119,6 +119,8 @@ class _EditBankDetailsState extends State<EditBankDetails> {
 
   @override
   Widget build(BuildContext context) {
+    final height = MediaQuery.of(context).size.height;
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Bank Details'),
@@ -145,7 +147,7 @@ class _EditBankDetailsState extends State<EditBankDetails> {
                       border: OutlineInputBorder(),
                     ),
                   ),
-                  SizedBox(height: 10),
+                  SizedBox(height: height * 0.013),
                   TextFormField(
                     controller: ifscController,
                     textCapitalization: TextCapitalization.characters,
@@ -154,7 +156,7 @@ class _EditBankDetailsState extends State<EditBankDetails> {
                       border: OutlineInputBorder(),
                     ),
                   ),
-                  SizedBox(height: 10),
+                  SizedBox(height: height * 0.013),
                   TextFormField(
                     controller: accNumController,
                     obscureText: true,
@@ -163,7 +165,7 @@ class _EditBankDetailsState extends State<EditBankDetails> {
                       border: OutlineInputBorder(),
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  SizedBox(height: height * 0.012),
                   TextFormField(
                     controller: confirmAccNumber,
                     decoration: InputDecoration(
@@ -171,7 +173,7 @@ class _EditBankDetailsState extends State<EditBankDetails> {
                       border: OutlineInputBorder(),
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  SizedBox(height: height * 0.013),
                   SizedBox(
                     width: double.infinity,
                     child: CustomButton(

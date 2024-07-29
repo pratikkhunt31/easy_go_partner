@@ -98,15 +98,15 @@ class _OtpScreenState extends State<OtpScreen> {
                       fit: BoxFit.contain,
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  SizedBox(height: screenHeight * 0.01),
                   const Text(
-                    "Verification",
+                    "OTP Verification",
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  SizedBox(height: screenHeight * 0.01),
                   const Text(
                     "Enter the OTP sent to your phone number",
                     style: TextStyle(
@@ -115,19 +115,13 @@ class _OtpScreenState extends State<OtpScreen> {
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 20),
-                  // const Pinput(
-                  //   length: 6,
-                  //   showCursor: true,
-                  //   // defaultPinTheme: ,
-                  //   // controller: otpController,
-                  // ),
+                  SizedBox(height: screenHeight * 0.02),
                   Pinput(
                     length: 6,
                     showCursor: true,
                     defaultPinTheme: PinTheme(
                       width: 60,
-                      height: 60,
+                      height: screenHeight * 0.06,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(
@@ -145,7 +139,7 @@ class _OtpScreenState extends State<OtpScreen> {
                       });
                     },
                   ),
-                  const SizedBox(height: 20),
+                  SizedBox(height: screenHeight * 0.02),
                   SizedBox(
                     width: double.infinity,
                     height: 50,
@@ -171,7 +165,7 @@ class _OtpScreenState extends State<OtpScreen> {
                           : () {},
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  SizedBox(height: screenHeight * 0.02),
                   const Text(
                     "Didn't receive any code?",
                     style: TextStyle(
@@ -180,15 +174,6 @@ class _OtpScreenState extends State<OtpScreen> {
                       color: Colors.black,
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  // const Text(
-                  //   "Resend New Code",
-                  //   style: TextStyle(
-                  //     fontSize: 14,
-                  //     fontWeight: FontWeight.bold,
-                  //     color: Color(0xFF0000FF),
-                  //   ),
-                  // ),
                   GestureDetector(
                     onTap: isResendButtonEnabled
                         ? () async {

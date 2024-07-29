@@ -6,7 +6,6 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pinput/pinput.dart';
-import 'package:velocity_x/velocity_x.dart';
 
 import '../../controller/auth_controller.dart';
 import '../../widget/custom_widget.dart';
@@ -15,9 +14,8 @@ class VerifyRideOtp extends StatefulWidget {
   final String phoneNumber;
   final String rideId;
 
-  // final String countryCode;
-
-  const VerifyRideOtp(this.phoneNumber, this.rideId, {Key? key}) : super(key: key);
+  const VerifyRideOtp(this.phoneNumber, this.rideId, {Key? key})
+      : super(key: key);
 
   @override
   State<VerifyRideOtp> createState() => _VerifyRideOtpState();
@@ -111,36 +109,30 @@ class _VerifyRideOtpState extends State<VerifyRideOtp> {
                       fit: BoxFit.contain,
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  SizedBox(height: screenHeight * 0.01),
                   const Text(
-                    "Verification",
+                    "Ride Verification",
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 10),
+                  SizedBox(height: screenHeight * 0.01),
                   const Text(
-                    "Enter the OTP sent to your phone number",
+                    "Enter the OTP sent to the receiver phone number",
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.black45,
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 20),
-                  // const Pinput(
-                  //   length: 6,
-                  //   showCursor: true,
-                  //   // defaultPinTheme: ,
-                  //   // controller: otpController,
-                  // ),
+                  SizedBox(height: screenHeight * 0.02),
                   Pinput(
                     length: 6,
                     showCursor: true,
                     defaultPinTheme: PinTheme(
                       width: 60,
-                      height: 60,
+                      height: screenHeight * 0.06,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(
@@ -158,7 +150,7 @@ class _VerifyRideOtpState extends State<VerifyRideOtp> {
                       });
                     },
                   ),
-                  const SizedBox(height: 20),
+                  SizedBox(height: screenHeight * 0.02),
                   SizedBox(
                     width: double.infinity,
                     height: 50,
@@ -170,22 +162,21 @@ class _VerifyRideOtpState extends State<VerifyRideOtp> {
                       borderRadius: BorderRadius.circular(25.0),
                       onPress: otpCode.toString().length.isEqual(6)
                           ? () async {
-                        try {
-                          await authController.verifyOtp(otpCode!);
-                          await completeRide();
-                          Get.snackbar(
-                            "Success",
-                            "Ride completed",
-                            backgroundColor: Colors.green,
-                            colorText: Colors.white,
-                          );
-                          Navigator.pop(context);
-                          Navigator.pop(context);
-                          // Get.offAll(() => HomeView());
-                        } catch (e) {
-                          authController.error("Error verifying OTP", e);
-                        }
-                      }
+                              try {
+                                await authController.verifyRideOtp(otpCode!);
+                                await completeRide();
+                                Get.snackbar(
+                                  "Success",
+                                  "Ride completed",
+                                  backgroundColor: Colors.green,
+                                  colorText: Colors.white,
+                                );
+                                Navigator.pop(context);
+                                Navigator.pop(context);
+                              } catch (e) {
+                                authController.error("Error verifying OTP", e);
+                              }
+                            }
                           : () {},
                     ),
                   ),
@@ -198,46 +189,37 @@ class _VerifyRideOtpState extends State<VerifyRideOtp> {
                       color: Colors.black,
                     ),
                   ),
-                  // const SizedBox(height: 15),
-                  // const Text(
-                  //   "Resend New Code",
-                  //   style: TextStyle(
-                  //     fontSize: 14,
-                  //     fontWeight: FontWeight.bold,
-                  //     color: Color(0xFF0000FF),
-                  //   ),
-                  // ),
                   GestureDetector(
                     onTap: isResendButtonEnabled
                         ? () async {
-                      int retryCount = 0;
-                      const int maxRetries = 3;
+                            int retryCount = 0;
+                            const int maxRetries = 3;
 
-                      while (retryCount < maxRetries) {
-                        try {
-                          await authController
-                              .rideAuth(widget.phoneNumber);
-                          startTimer();
-                          break; // Exit the loop if successful
-                        } catch (e) {
-                          if (e is FirebaseException &&
-                              e.message == 'Too many attempts') {
-                            retryCount++;
-                            if (retryCount >= maxRetries) {
-                              print(
-                                  "Too many attempts. Please try again later.");
-                              break;
+                            while (retryCount < maxRetries) {
+                              try {
+                                await authController
+                                    .rideAuth(widget.phoneNumber);
+                                startTimer();
+                                break; // Exit the loop if successful
+                              } catch (e) {
+                                if (e is FirebaseException &&
+                                    e.message == 'Too many attempts') {
+                                  retryCount++;
+                                  if (retryCount >= maxRetries) {
+                                    print(
+                                        "Too many attempts. Please try again later.");
+                                    break;
+                                  }
+                                  await Future.delayed(Duration(
+                                      seconds: 2 *
+                                          retryCount)); // Exponential backoff
+                                } else {
+                                  print("Error: $e");
+                                  break;
+                                }
+                              }
                             }
-                            await Future.delayed(Duration(
-                                seconds: 2 *
-                                    retryCount)); // Exponential backoff
-                          } else {
-                            print("Error: $e");
-                            break;
                           }
-                        }
-                      }
-                    }
                         : null,
                     child: Text(
                       isResendButtonEnabled

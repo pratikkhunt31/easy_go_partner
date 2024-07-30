@@ -25,29 +25,27 @@ class _LoginFormState extends State<LoginForm> {
   validate() async {
     if (driverController.nameController.text.isEmpty) {
       authController.validSnackBar("Name is not empty");
-    }
-    // else if (driverController.emailController.text.isEmpty) {
-    //   authController.validSnackBar("Email Address is not empty");
-    // } else if (!driverController.emailController.text.contains("@gmail.com")) {
-    //   authController.validSnackBar("Email Address is not valid");
-    // } else if (driverController.addressController.text.isEmpty) {
-    //   authController.validSnackBar("Address is not empty");
-    // } else if (driverController.selectedVehicleNotifier.value == null) {
-    //   authController.validSnackBar("Vehicle-type is not empty");
-    // } else if (driverController.rcNumController.text.isEmpty) {
-    //   authController.validSnackBar("RC-Number is not empty");
-    // } else if (driverController.rcBookImg == null) {
-    //   authController.validSnackBar("Upload RC book image");
-    // } else if (driverController.vNumController.text.isEmpty) {
-    //   authController.validSnackBar("Vehicle Number is not empty");
-    // } else if (driverController.vehicleImages.length < 2) {
-    //   authController.validSnackBar("Upload vehicle images image");
-    // } else if (driverController.dLController.text.isEmpty) {
-    //   authController.validSnackBar("DL-Number is not empty");
-    // } else if (driverController.licenseImg == null) {
-    //   authController.validSnackBar("Upload License image");
-    // }
-    else {
+    } else if (driverController.emailController.text.isEmpty) {
+      authController.validSnackBar("Email Address is not empty");
+    } else if (!driverController.emailController.text.contains("@gmail.com")) {
+      authController.validSnackBar("Email Address is not valid");
+    } else if (driverController.addressController.text.isEmpty) {
+      authController.validSnackBar("Address is not empty");
+    } else if (driverController.selectedVehicleNotifier.value == null) {
+      authController.validSnackBar("Vehicle-type is not empty");
+    } else if (driverController.rcNumController.text.isEmpty) {
+      authController.validSnackBar("RC-Number is not empty");
+    } else if (driverController.rcBookImg == null) {
+      authController.validSnackBar("Upload RC book image");
+    } else if (driverController.vNumController.text.isEmpty) {
+      authController.validSnackBar("Vehicle Number is not empty");
+    } else if (driverController.vehicleImages.length < 2) {
+      authController.validSnackBar("Upload vehicle images image");
+    } else if (driverController.dLController.text.isEmpty) {
+      authController.validSnackBar("DL-Number is not empty");
+    } else if (driverController.licenseImg == null) {
+      authController.validSnackBar("Upload License image");
+    } else {
       routePage();
     }
   }
@@ -267,7 +265,7 @@ class _LoginFormState extends State<LoginForm> {
             SizedBox(height: MediaQuery.of(context).size.height * 0.02),
             OutlinedButton.icon(
               onPressed: () => showImagePickerOptions(
-                      (file) => driverController.rcBookImg = file),
+                  (file) => driverController.rcBookImg = file),
               icon: Icon(Icons.add_photo_alternate_outlined),
               label: Text(
                 'Upload RC book Image',
@@ -277,9 +275,9 @@ class _LoginFormState extends State<LoginForm> {
               ),
               style: ButtonStyle(
                 backgroundColor:
-                MaterialStateProperty.all<Color>(Colors.grey.shade300),
+                    MaterialStateProperty.all<Color>(Colors.grey.shade300),
                 foregroundColor:
-                MaterialStateProperty.all<Color>(Colors.black87),
+                    MaterialStateProperty.all<Color>(Colors.black87),
                 side: MaterialStateProperty.all<BorderSide>(
                   BorderSide(color: Colors.grey.shade600),
                 ),
@@ -293,35 +291,36 @@ class _LoginFormState extends State<LoginForm> {
             SizedBox(height: MediaQuery.of(context).size.height * 0.02),
             driverController.rcBookImg != null
                 ? Column(
-              children: [
-                Container(
-                  width: MediaQuery.of(context).size.width * 0.4,
-                  child: Image.file(
-                    driverController.rcBookImg!,
-                    height: MediaQuery.of(context).size.width * 0.4,
-                    fit: BoxFit.fill,
-                  ),
-                ),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.01),
-                ElevatedButton(
-                  style: ButtonStyle(
-                    backgroundColor:
-                    MaterialStateProperty.all<Color>(Colors.red),
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      driverController.rcBookImg = null;
-                    });
-                  },
-                  child: Text(
-                    'Remove Image',
-                    style: TextStyle(
-                      fontSize: MediaQuery.of(context).size.width * 0.035,
-                    ),
-                  ),
-                ),
-              ],
-            )
+                    children: [
+                      Container(
+                        width: MediaQuery.of(context).size.width * 0.4,
+                        child: Image.file(
+                          driverController.rcBookImg!,
+                          height: MediaQuery.of(context).size.width * 0.4,
+                          fit: BoxFit.fill,
+                        ),
+                      ),
+                      SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.01),
+                      ElevatedButton(
+                        style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all<Color>(Colors.red),
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            driverController.rcBookImg = null;
+                          });
+                        },
+                        child: Text(
+                          'Remove Image',
+                          style: TextStyle(
+                            fontSize: MediaQuery.of(context).size.width * 0.035,
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
                 : Container(),
             SizedBox(height: MediaQuery.of(context).size.height * 0.01),
             formField(
@@ -341,9 +340,9 @@ class _LoginFormState extends State<LoginForm> {
               ),
               style: ButtonStyle(
                 backgroundColor:
-                MaterialStateProperty.all<Color>(Colors.grey.shade300),
+                    MaterialStateProperty.all<Color>(Colors.grey.shade300),
                 foregroundColor:
-                MaterialStateProperty.all<Color>(Colors.black87),
+                    MaterialStateProperty.all<Color>(Colors.black87),
                 side: MaterialStateProperty.all<BorderSide>(
                   BorderSide(color: Colors.grey.shade600),
                 ),
@@ -367,44 +366,47 @@ class _LoginFormState extends State<LoginForm> {
             SizedBox(height: MediaQuery.of(context).size.height * 0.01),
             driverController.vehicleImages.isNotEmpty
                 ? Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: driverController.vehicleImages.map((file) {
-                    return Column(
-                      children: [
-                        Container(
-                          width: MediaQuery.of(context).size.width * 0.4,
-                          child: Image.file(
-                            file,
-                            height: MediaQuery.of(context).size.width * 0.4,
-                            fit: BoxFit.fill,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: driverController.vehicleImages.map((file) {
+                          return Column(
+                            children: [
+                              Container(
+                                width: MediaQuery.of(context).size.width * 0.4,
+                                child: Image.file(
+                                  file,
+                                  height:
+                                      MediaQuery.of(context).size.width * 0.4,
+                                  fit: BoxFit.fill,
+                                ),
+                              ),
+                              SizedBox(
+                                  height: MediaQuery.of(context).size.height *
+                                      0.02),
+                            ],
+                          );
+                        }).toList(),
+                      ),
+                      ElevatedButton(
+                        style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all<Color>(Colors.red),
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            driverController.vehicleImages = List.empty();
+                          });
+                        },
+                        child: Text(
+                          'Remove Image',
+                          style: TextStyle(
+                            fontSize: MediaQuery.of(context).size.width * 0.035,
                           ),
                         ),
-                        SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-                      ],
-                    );
-                  }).toList(),
-                ),
-                ElevatedButton(
-                  style: ButtonStyle(
-                    backgroundColor:
-                    MaterialStateProperty.all<Color>(Colors.red),
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      driverController.vehicleImages = List.empty();
-                    });
-                  },
-                  child: Text(
-                    'Remove Image',
-                    style: TextStyle(
-                      fontSize: MediaQuery.of(context).size.width * 0.035,
-                    ),
-                  ),
-                ),
-              ],
-            )
+                      ),
+                    ],
+                  )
                 : Container(),
             SizedBox(height: MediaQuery.of(context).size.height * 0.01),
             formField(
@@ -426,9 +428,9 @@ class _LoginFormState extends State<LoginForm> {
               ),
               style: ButtonStyle(
                 backgroundColor:
-                MaterialStateProperty.all<Color>(Colors.grey.shade300),
+                    MaterialStateProperty.all<Color>(Colors.grey.shade300),
                 foregroundColor:
-                MaterialStateProperty.all<Color>(Colors.black87),
+                    MaterialStateProperty.all<Color>(Colors.black87),
                 side: MaterialStateProperty.all<BorderSide>(
                   BorderSide(color: Colors.grey.shade600),
                 ),
@@ -443,35 +445,36 @@ class _LoginFormState extends State<LoginForm> {
             SizedBox(height: MediaQuery.of(context).size.height * 0.01),
             driverController.licenseImg != null
                 ? Column(
-              children: [
-                Container(
-                  width: MediaQuery.of(context).size.width * 0.4,
-                  child: Image.file(
-                    driverController.licenseImg!,
-                    height: MediaQuery.of(context).size.width * 0.4,
-                    fit: BoxFit.fill,
-                  ),
-                ),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-                ElevatedButton(
-                  style: ButtonStyle(
-                    backgroundColor:
-                    MaterialStateProperty.all<Color>(Colors.red),
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      driverController.licenseImg = null;
-                    });
-                  },
-                  child: Text(
-                    'Remove Image',
-                    style: TextStyle(
-                      fontSize: MediaQuery.of(context).size.width * 0.035,
-                    ),
-                  ),
-                ),
-              ],
-            )
+                    children: [
+                      Container(
+                        width: MediaQuery.of(context).size.width * 0.4,
+                        child: Image.file(
+                          driverController.licenseImg!,
+                          height: MediaQuery.of(context).size.width * 0.4,
+                          fit: BoxFit.fill,
+                        ),
+                      ),
+                      SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.02),
+                      ElevatedButton(
+                        style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all<Color>(Colors.red),
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            driverController.licenseImg = null;
+                          });
+                        },
+                        child: Text(
+                          'Remove Image',
+                          style: TextStyle(
+                            fontSize: MediaQuery.of(context).size.width * 0.035,
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
                 : Container(),
             SizedBox(height: MediaQuery.of(context).size.height * 0.01),
             SizedBox(
@@ -491,5 +494,4 @@ class _LoginFormState extends State<LoginForm> {
       ),
     );
   }
-
 }

@@ -227,7 +227,7 @@ class _BankDetailsState extends State<BankDetails> {
                           fit: BoxFit.fill,
                         ),
                       ),
-                      SizedBox(height: height * 0.8),
+                      // SizedBox(height: height * 0.02),
                       ElevatedButton(
                         style: ButtonStyle(
                           backgroundColor:
@@ -243,7 +243,7 @@ class _BankDetailsState extends State<BankDetails> {
                     ],
                   )
                 : Container(),
-            SizedBox(height: height * 0.02),
+            SizedBox(height: height * 0.018),
             SizedBox(
               width: double.infinity,
               child: CustomButton(

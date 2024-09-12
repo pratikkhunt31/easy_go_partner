@@ -1,7 +1,7 @@
+import 'package:easy_go_partner/controller/notification.dart';
 import 'package:easy_go_partner/firebase_options.dart';
 import 'package:easy_go_partner/screens/home/home_view.dart';
 import 'package:easy_go_partner/screens/login/num_screen.dart';
-import 'package:easy_go_partner/screens/splash_screen/splash_screen.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -20,6 +20,7 @@ void main() async {
     androidProvider: AndroidProvider.debug,
   );
 
+  await NotificationService().initNotification();
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
   ]);

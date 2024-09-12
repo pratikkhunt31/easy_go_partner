@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -45,14 +46,14 @@ class DriverController extends GetxController {
     return await taskSnapshot.ref.getDownloadURL();
   }
 
-
-  Future<void> registerUser(String phoneNumber, String accountId) async {
+  Future<void> registerDriver(String phoneNumber, String accountId) async {
     try {
       if (currentUser != null) {
         String rcBookImageUrl = '';
         String licenseImageUrl = '';
         String passBookImageUrl = '';
         List<String> vehicleImageUrls = [];
+        FirebaseMessaging fMessaging = FirebaseMessaging.instance;
 
         if (rcBookImg != null) {
           rcBookImageUrl = await uploadFile(rcBookImg!);
@@ -69,6 +70,8 @@ class DriverController extends GetxController {
         for (File image in vehicleImages) {
           vehicleImageUrls.add(await uploadFile(image));
         }
+
+        final fCMToken = await fMessaging.getToken();
 
         Map driverData = {
           'account_id': accountId,
@@ -91,6 +94,8 @@ class DriverController extends GetxController {
           'is_verified': false,
           'is_online': true,
           'd_id': currentUser!.uid,
+          'admin_token': 'chMbnNrgSgue9ePUstPOA6:APA91bESjX_uYCd-Bikruo4d3Qmmg1LjQLPaKWEwA92LR8GPGt00VXiw4bm63bjYFsiKwFl1ZntsnDO1lKd-aVkwfDjs6LzigAGvBkEbYatZVW74cl9BIuM6ItR1DVNMZGbZYbjZNa39',
+          'driver_token': fCMToken,
           'passBookImage': passBookImageUrl,
           'rcBookImage': rcBookImageUrl,
           'vehicleImages': vehicleImageUrls,

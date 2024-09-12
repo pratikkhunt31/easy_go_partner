@@ -2,13 +2,16 @@ import 'dart:async';
 import 'package:easy_go_partner/consts/firebase_consts.dart';
 import 'package:easy_go_partner/ride/request_detail.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart' as geo;
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:in_app_update/in_app_update.dart';
 import 'package:location/location.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:permission_handler/permission_handler.dart' as per;
 import '../../assistants/assistantsMethod.dart';
 import '../../controller/driver_controller.dart';
 import '../../dataHandler/appData.dart';
@@ -45,10 +48,12 @@ class _HomeScreenState extends State<HomeScreen> {
     loadUserData();
     fetchDriverVerificationStatus();
     checkLocationPermission();
-    isVerified =
-        false; // Initialize with false until verification status is fetched
-    isLoading = true;
+    checkNotificationPermission();
+    updateFcmToken();
 
+    isVerified =
+    false; // Initialize with false until verification status is fetched
+    isLoading = true;
     if (isOnline) {
       startLocationUpdates();
     }
@@ -79,6 +84,109 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  void checkNotificationPermission() async {
+    per.PermissionStatus permission = await per.Permission.notification.status;
+    if (permission.isDenied || permission.isPermanentlyDenied) {
+      // Request notification permissions if not granted or permanently denied
+      permission = await per.Permission.notification.request();
+
+      if (permission.isGranted) {
+        // Permission granted
+        validSnackBar('Notification permission granted.');
+      } else {
+        // Handle the case where the user denies or permanently denies permission
+        validSnackBar('You have to enable notification permission.');
+      }
+    } else {}
+  }
+
+  Future<void> checkForUpdate() async {
+    try {
+      AppUpdateInfo updateInfo = await InAppUpdate.checkForUpdate();
+      if (updateInfo.updateAvailability == UpdateAvailability.updateAvailable) {
+        showUpdateDialog();
+      }
+    } catch (e) {
+      // Handle the error appropriately, if needed
+      // showErrorSnackBar('Failed to check for updates. Please try again later.');
+    }
+  }
+
+  Future<void> performUpdate() async {
+    try {
+      await InAppUpdate.startFlexibleUpdate();
+      await InAppUpdate.completeFlexibleUpdate();
+      showSuccessSnackBar('App updated successfully.');
+    } catch (e) {
+      showErrorSnackBar('Failed to update the app. Please try again later.');
+    }
+  }
+
+  void showUpdateDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Update Available'),
+          content: Text(
+              'A new version of the app is available. Please update to continue using the app.'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Later'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Update'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                performUpdate();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void showSuccessSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.green,
+      ),
+    );
+  }
+
+  void showErrorSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
+
+  Future<void> updateFcmToken() async {
+    try {
+      if (currentUser != null) {
+        FirebaseMessaging fMessaging = FirebaseMessaging.instance;
+        final fCMToken = await fMessaging.getToken();
+
+        DatabaseReference database = FirebaseDatabase.instance.ref();
+        await database
+            .child('drivers')
+            .child(currentUser!.uid)
+            .update({'driver_token': fCMToken});
+      } else {
+        // print("User is not logged in");
+      }
+    } catch (e) {
+      print("Failed to update FCM token: $e");
+    }
+  }
+
   Future<String?> getVehicleType() async {
     DatabaseReference driverRef = FirebaseDatabase.instance
         .ref()
@@ -90,7 +198,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if (snapshot.value != null) {
       // Extract the vehicleType from the snapshot
       Map<String, dynamic> driverData =
-          Map<String, dynamic>.from(snapshot.value as Map);
+      Map<String, dynamic>.from(snapshot.value as Map);
       return driverData['vehicleType'] as String?;
     } else {
       return null;
@@ -106,19 +214,20 @@ class _HomeScreenState extends State<HomeScreen> {
 
       verificationStatusSubscription =
           userRef.onValue.listen((DatabaseEvent event) {
-        if (event.snapshot.exists) {
-          Map<String, dynamic> userData =
+            if (event.snapshot.exists) {
+              Map<String, dynamic> userData =
               Map<String, dynamic>.from(event.snapshot.value as Map);
-          bool verified =
-              userData['is_verified'] ?? false; // Default to false if not found
-          if (mounted) {
-            setState(() {
-              isVerified = verified;
-              isLoading = false;
-            });
-          }
-        }
-      });
+              bool verified =
+                  userData['is_verified'] ??
+                      false; // Default to false if not found
+              if (mounted) {
+                setState(() {
+                  isVerified = verified;
+                  isLoading = false;
+                });
+              }
+            }
+          });
     }
   }
 
@@ -131,7 +240,7 @@ class _HomeScreenState extends State<HomeScreen> {
       DataSnapshot snapshot = await userRef.get();
       if (snapshot.exists) {
         Map<String, dynamic> userData =
-            Map<String, dynamic>.from(snapshot.value as Map);
+        Map<String, dynamic>.from(snapshot.value as Map);
         if (mounted) {
           setState(() {
             isOnline = userData['is_online'];
@@ -234,21 +343,22 @@ class _HomeScreenState extends State<HomeScreen> {
     Location location = Location();
     locationSubscription =
         location.onLocationChanged.listen((LocationData currentLocation) {
-      updateDriverLocationForAllPendingRides(currentLocation);
-    });
+          updateDriverLocationForAllPendingRides(currentLocation);
+        });
     if (!mounted) {
       location.enableBackgroundMode(enable: true);
     }
   }
 
-  void updateDriverLocationForAllPendingRides(LocationData currentLocation) async {
+  void updateDriverLocationForAllPendingRides(
+      LocationData currentLocation) async {
     if (currentUser == null) {
       print("User is not logged in");
       return;
     }
 
     DatabaseReference rideRequestRef =
-        FirebaseDatabase.instance.ref().child('Ride Request');
+    FirebaseDatabase.instance.ref().child('Ride Request');
 
     // Fetch all ride requests where driver_id is equal to currentUserId and status is 'pending'
     rideRequestRef
@@ -258,7 +368,7 @@ class _HomeScreenState extends State<HomeScreen> {
         .then((DatabaseEvent event) {
       if (event.snapshot.exists) {
         Map<String, dynamic> rides =
-            Map<String, dynamic>.from(event.snapshot.value as Map);
+        Map<String, dynamic>.from(event.snapshot.value as Map);
 
         rides.forEach((key, value) {
           Map<String, dynamic> rideData = Map<String, dynamic>.from(value);
@@ -545,10 +655,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> acceptRideRequest(String rideRequestId) async {
     var pickUp = appData.currentLocation;
+    FirebaseMessaging fMessaging = FirebaseMessaging.instance;
+
     Map<String, String> currentLocMap = {
       'latitude': pickUp.latitude.toString(),
       'longitude': pickUp.longitude.toString()
     };
+
+    final fCMToken = await fMessaging.getToken();
 
     DatabaseReference rideRequestRef = FirebaseDatabase.instance
         .ref()
@@ -558,6 +672,7 @@ class _HomeScreenState extends State<HomeScreen> {
       'd_address': currentLocController.text,
       'd_location': currentLocMap,
       'driver_id': currentUser!.uid,
+      'driver_token': fCMToken,
     });
 
     updateDriverLocation(rideRequestId);

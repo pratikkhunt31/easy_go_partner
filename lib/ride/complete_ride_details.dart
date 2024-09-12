@@ -70,6 +70,7 @@ class _CompleteRideDetailsState extends State<CompleteRideDetails> {
       appBar: AppBar(
         title: Text("Complete Ride"),
         backgroundColor: const Color(0xFF0000FF),
+        elevation: 0,
       ),
       body: Container(
         color: Colors.black12,

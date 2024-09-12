@@ -78,6 +78,7 @@ class _RequestDetailState extends State<RequestDetail> {
       appBar: AppBar(
         title: Text('Request Detail'),
         backgroundColor: const Color(0xFF0000FF),
+        elevation: 0,
       ),
       body: Container(
         color: Colors.black12,

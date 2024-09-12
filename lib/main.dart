@@ -1,10 +1,12 @@
 import 'package:easy_go_partner/firebase_options.dart';
+import 'package:easy_go_partner/plugin/location_service_plugin.dart';
 import 'package:easy_go_partner/screens/home/home_view.dart';
 import 'package:easy_go_partner/screens/login/num_screen.dart';
 import 'package:easy_go_partner/screens/splash_screen/splash_screen.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -50,6 +52,26 @@ class _AuthRedirectState extends State<AuthRedirect> {
   void initState() {
     super.initState();
     changeScreen();
+
+    // TODO: remove this test code
+    // if (kDebugMode) {
+    //   debugPrint("Starting location service");
+    //   LocationServicePlugin.startLocationService("-O11ON1TnX_lNENmOpZV");
+
+    //   Future.delayed(Duration(seconds: 10), () async {
+    //     debugPrint("Is Location Service Running: " +
+    //         (await LocationServicePlugin.checkServiceRunning()).toString());
+    //   });
+
+    //   Future.delayed(Duration(seconds: 30), () {
+    //     LocationServicePlugin.stopLocationService();
+    //   });
+
+    //   Future.delayed(Duration(seconds: 32), () async {
+    //     debugPrint("Is Location Service Running: " +
+    //         (await LocationServicePlugin.checkServiceRunning()).toString());
+    //   });
+    // }
   }
 
   void changeScreen() {

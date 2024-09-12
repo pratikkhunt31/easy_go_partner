@@ -154,7 +154,7 @@ class _OtpScreenState extends State<OtpScreen> {
                               try {
                                 Future.delayed(Duration(seconds: 4));
                                 await authController.verifyOtp(otpCode!);
-                                await driverController.registerUser(
+                                await driverController.registerDriver(
                                     widget.phoneNumber, widget.accountId);
                                 // Get.offAll(() =>  HomeView());
                               } catch (e) {

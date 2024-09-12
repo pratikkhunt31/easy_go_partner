@@ -77,6 +77,9 @@ dependencies:
   flutter_foreground_service: ^0.4.1
   flutter_foreground_task: ^6.1.2
   loading_indicator: ^3.1.1
+  firebase_messaging: ^14.7.10
+  flutter_local_notifications: ^17.2.2
+  in_app_update: ^4.2.3
 
 #  url_launcher: ^6.1.11
 #  url_launcher_android: ^6.0.20

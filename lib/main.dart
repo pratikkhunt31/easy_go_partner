@@ -1,12 +1,10 @@
 import 'package:easy_go_partner/controller/notification.dart';
 import 'package:easy_go_partner/firebase_options.dart';
-import 'package:easy_go_partner/plugin/location_service_plugin.dart';
 import 'package:easy_go_partner/screens/home/home_view.dart';
 import 'package:easy_go_partner/screens/login/num_screen.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';

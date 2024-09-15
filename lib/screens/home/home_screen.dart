@@ -15,6 +15,7 @@ import 'package:permission_handler/permission_handler.dart' as per;
 import '../../assistants/assistantsMethod.dart';
 import '../../controller/driver_controller.dart';
 import '../../dataHandler/appData.dart';
+import '../../plugin/location_service_plugin.dart';
 import '../../widget/custom_widget.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -52,7 +53,7 @@ class _HomeScreenState extends State<HomeScreen> {
     updateFcmToken();
 
     isVerified =
-    false; // Initialize with false until verification status is fetched
+        false; // Initialize with false until verification status is fetched
     isLoading = true;
     if (isOnline) {
       startLocationUpdates();
@@ -198,7 +199,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if (snapshot.value != null) {
       // Extract the vehicleType from the snapshot
       Map<String, dynamic> driverData =
-      Map<String, dynamic>.from(snapshot.value as Map);
+          Map<String, dynamic>.from(snapshot.value as Map);
       return driverData['vehicleType'] as String?;
     } else {
       return null;
@@ -214,20 +215,19 @@ class _HomeScreenState extends State<HomeScreen> {
 
       verificationStatusSubscription =
           userRef.onValue.listen((DatabaseEvent event) {
-            if (event.snapshot.exists) {
-              Map<String, dynamic> userData =
+        if (event.snapshot.exists) {
+          Map<String, dynamic> userData =
               Map<String, dynamic>.from(event.snapshot.value as Map);
-              bool verified =
-                  userData['is_verified'] ??
-                      false; // Default to false if not found
-              if (mounted) {
-                setState(() {
-                  isVerified = verified;
-                  isLoading = false;
-                });
-              }
-            }
-          });
+          bool verified =
+              userData['is_verified'] ?? false; // Default to false if not found
+          if (mounted) {
+            setState(() {
+              isVerified = verified;
+              isLoading = false;
+            });
+          }
+        }
+      });
     }
   }
 
@@ -240,7 +240,7 @@ class _HomeScreenState extends State<HomeScreen> {
       DataSnapshot snapshot = await userRef.get();
       if (snapshot.exists) {
         Map<String, dynamic> userData =
-        Map<String, dynamic>.from(snapshot.value as Map);
+            Map<String, dynamic>.from(snapshot.value as Map);
         if (mounted) {
           setState(() {
             isOnline = userData['is_online'];
@@ -338,8 +338,8 @@ class _HomeScreenState extends State<HomeScreen> {
     Location location = Location();
     locationSubscription =
         location.onLocationChanged.listen((LocationData currentLocation) {
-          updateDriverLocationForAllPendingRides(currentLocation);
-        });
+      updateDriverLocationForAllPendingRides(currentLocation);
+    });
     if (!mounted) {
       location.enableBackgroundMode(enable: true);
     }
@@ -353,7 +353,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     DatabaseReference rideRequestRef =
-    FirebaseDatabase.instance.ref().child('Ride Request');
+        FirebaseDatabase.instance.ref().child('Ride Request');
 
     // Fetch all ride requests where driver_id is equal to currentUserId and status is 'pending'
     rideRequestRef
@@ -363,11 +363,12 @@ class _HomeScreenState extends State<HomeScreen> {
         .then((DatabaseEvent event) {
       if (event.snapshot.exists) {
         Map<String, dynamic> rides =
-        Map<String, dynamic>.from(event.snapshot.value as Map);
+            Map<String, dynamic>.from(event.snapshot.value as Map);
 
         rides.forEach((key, value) {
           Map<String, dynamic> rideData = Map<String, dynamic>.from(value);
           if (rideData['status'] == 'pending') {
+            LocationServicePlugin.startLocationService(key);
             DatabaseReference rideRequestRef = FirebaseDatabase.instance
                 .ref()
                 .child('Ride Request')
@@ -443,210 +444,210 @@ class _HomeScreenState extends State<HomeScreen> {
         return Scaffold(
           appBar: isVerified
               ? AppBar(
-            title: const Text("Ride Request"),
-            backgroundColor: const Color(0xFF0000FF),
-            elevation: 0,
-            actions: [
-              Switch(
-                value: isOnline,
-                onChanged: (value) {
-                  if (value) {
-                    updateOnlineStatus(true);
-                  } else {
-                    showOfflineConfirmation();
-                  }
-                },
-                activeColor: Colors.green,
-              ),
-            ],
-          )
+                  title: const Text("Ride Request"),
+                  backgroundColor: const Color(0xFF0000FF),
+                  elevation: 0,
+                  actions: [
+                    Switch(
+                      value: isOnline,
+                      onChanged: (value) {
+                        if (value) {
+                          updateOnlineStatus(true);
+                        } else {
+                          showOfflineConfirmation();
+                        }
+                      },
+                      activeColor: Colors.green,
+                    ),
+                  ],
+                )
               : AppBar(
-            title: const Text("Ride Request"),
-            backgroundColor: const Color(0xFF0000FF),
-            elevation: 0,
-          ),
+                  title: const Text("Ride Request"),
+                  backgroundColor: const Color(0xFF0000FF),
+                  elevation: 0,
+                ),
           body: isOnline
               ? Obx(() {
-            if (driverController.rideRequests.isEmpty) {
-              return FutureBuilder(
-                future: Future.delayed(Duration(seconds: 1)),
-                // Simulate a short loading period
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(
-                        child: CircularProgressIndicator(
-                          color: Color(0xFF0000FF),
-                        ));
-                  } else {
-                    return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.error_outline, size: iconSize),
-                          SizedBox(height: screenHeight * 0.02),
-                          Text(
-                            "No Request Available",
-                            style: TextStyle(fontSize: fontSize),
-                          ),
-                        ],
-                      ),
+                  if (driverController.rideRequests.isEmpty) {
+                    return FutureBuilder(
+                      future: Future.delayed(Duration(seconds: 1)),
+                      // Simulate a short loading period
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return Center(
+                              child: CircularProgressIndicator(
+                            color: Color(0xFF0000FF),
+                          ));
+                        } else {
+                          return Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.error_outline, size: iconSize),
+                                SizedBox(height: screenHeight * 0.02),
+                                Text(
+                                  "No Request Available",
+                                  style: TextStyle(fontSize: fontSize),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+                      },
                     );
                   }
-                },
-              );
-            }
-            return ListView.builder(
-              itemCount: driverController.rideRequests.length,
-              itemBuilder: (context, index) {
-                var rideRequest = driverController.rideRequests[index];
-                return Padding(
-                  padding: EdgeInsets.only(bottom: screenHeight * 0.01),
-                  child: GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        PageTransition(
-                          child: RequestDetail(data: rideRequest),
-                          type: PageTransitionType.bottomToTop,
+                  return ListView.builder(
+                    itemCount: driverController.rideRequests.length,
+                    itemBuilder: (context, index) {
+                      var rideRequest = driverController.rideRequests[index];
+                      return Padding(
+                        padding: EdgeInsets.only(bottom: screenHeight * 0.01),
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              PageTransition(
+                                child: RequestDetail(data: rideRequest),
+                                type: PageTransitionType.bottomToTop,
+                              ),
+                            );
+                          },
+                          child: Card(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                ListTile(
+                                  leading: Image.asset(
+                                    'assets/images/truck2.png',
+                                    width: iconSize,
+                                    height: iconSize,
+                                  ),
+                                  title: Text(
+                                    rideRequest['created_at'],
+                                    style: TextStyle(fontSize: fontSize),
+                                  ),
+                                  trailing: Text(
+                                    rideRequest['payout'],
+                                    style: TextStyle(
+                                      fontSize: fontSize,
+                                      color: Color(0xFF0000FF),
+                                    ),
+                                  ),
+                                ),
+                                const Divider(height: 1.0, thickness: 1.0),
+                                const SizedBox(height: 5),
+                                Padding(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: screenWidth * 0.05),
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        "From: ",
+                                        style: TextStyle(fontSize: fontSize),
+                                      ),
+                                      SizedBox(width: screenWidth * 0.01),
+                                      Expanded(
+                                        child: Text(
+                                          rideRequest['pickUp_address'],
+                                          style: TextStyle(fontSize: fontSize),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Padding(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: screenWidth * 0.05),
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        "To: ",
+                                        style: TextStyle(fontSize: fontSize),
+                                      ),
+                                      SizedBox(width: screenWidth * 0.06),
+                                      Expanded(
+                                        child: Text(
+                                          rideRequest['dropOff_address'],
+                                          style: TextStyle(fontSize: fontSize),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 5),
+                                Center(
+                                  child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.green,
+                                    ),
+                                    onPressed: () async {
+                                      // Add accept request logic here
+                                      showDialog(
+                                        context: context,
+                                        barrierDismissible: false,
+                                        builder: (BuildContext context) {
+                                          return ProgressDialog(
+                                              message: "Request Accepting");
+                                        },
+                                      );
+                                      try {
+                                        await locatePosition();
+                                        acceptRideRequest(
+                                            rideRequest['rideRequestId']);
+                                        Navigator.pop(
+                                            context); // Close the progress dialog
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            content: Text('Request accepted'),
+                                            backgroundColor: Colors.green,
+                                          ),
+                                        );
+                                      } catch (e) {
+                                        Navigator.pop(
+                                            context); // Close the progress dialog
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            content: Text('Try again'),
+                                            backgroundColor: Colors.red,
+                                          ),
+                                        );
+                                      }
+                                    },
+                                    child: Text(
+                                      "Accept",
+                                      style: TextStyle(fontSize: fontSize),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                       );
                     },
-                    child: Card(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          ListTile(
-                            leading: Image.asset(
-                              'assets/images/truck2.png',
-                              width: iconSize,
-                              height: iconSize,
-                            ),
-                            title: Text(
-                              rideRequest['created_at'],
-                              style: TextStyle(fontSize: fontSize),
-                            ),
-                            trailing: Text(
-                              rideRequest['payout'],
-                              style: TextStyle(
-                                fontSize: fontSize,
-                                color: Color(0xFF0000FF),
-                              ),
-                            ),
-                          ),
-                          const Divider(height: 1.0, thickness: 1.0),
-                          const SizedBox(height: 5),
-                          Padding(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: screenWidth * 0.05),
-                            child: Row(
-                              children: [
-                                Text(
-                                  "From: ",
-                                  style: TextStyle(fontSize: fontSize),
-                                ),
-                                SizedBox(width: screenWidth * 0.01),
-                                Expanded(
-                                  child: Text(
-                                    rideRequest['pickUp_address'],
-                                    style: TextStyle(fontSize: fontSize),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Padding(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: screenWidth * 0.05),
-                            child: Row(
-                              children: [
-                                Text(
-                                  "To: ",
-                                  style: TextStyle(fontSize: fontSize),
-                                ),
-                                SizedBox(width: screenWidth * 0.06),
-                                Expanded(
-                                  child: Text(
-                                    rideRequest['dropOff_address'],
-                                    style: TextStyle(fontSize: fontSize),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 5),
-                          Center(
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.green,
-                              ),
-                              onPressed: () async {
-                                // Add accept request logic here
-                                showDialog(
-                                  context: context,
-                                  barrierDismissible: false,
-                                  builder: (BuildContext context) {
-                                    return ProgressDialog(
-                                        message: "Request Accepting");
-                                  },
-                                );
-                                try {
-                                  await locatePosition();
-                                  acceptRideRequest(
-                                      rideRequest['rideRequestId']);
-                                  Navigator.pop(
-                                      context); // Close the progress dialog
-                                  ScaffoldMessenger.of(context)
-                                      .showSnackBar(
-                                    SnackBar(
-                                      content: Text('Request accepted'),
-                                      backgroundColor: Colors.green,
-                                    ),
-                                  );
-                                } catch (e) {
-                                  Navigator.pop(
-                                      context); // Close the progress dialog
-                                  ScaffoldMessenger.of(context)
-                                      .showSnackBar(
-                                    SnackBar(
-                                      content: Text('Try again'),
-                                      backgroundColor: Colors.red,
-                                    ),
-                                  );
-                                }
-                              },
-                              child: Text(
-                                "Accept",
-                                style: TextStyle(fontSize: fontSize),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              },
-            );
-          })
+                  );
+                })
               : Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.cloud_off_sharp, size: iconSize),
-                SizedBox(height: screenHeight * 0.01),
-                Text(
-                  "You're offline",
-                  style: TextStyle(fontSize: fontSize),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.cloud_off_sharp, size: iconSize),
+                      SizedBox(height: screenHeight * 0.01),
+                      Text(
+                        "You're offline",
+                        style: TextStyle(fontSize: fontSize),
+                      ),
+                    ],
+                  ),
                 ),
-              ],
-            ),
-          ),
         );
       },
     );
   }
-
 
   Future<void> acceptRideRequest(String rideRequestId) async {
     var pickUp = appData.currentLocation;

@@ -326,11 +326,6 @@ class _HomeScreenState extends State<HomeScreen> {
           currentLocController.text = address;
         });
       }
-      // appData.updateDropOffLocationAddress(Address(
-      //   placeName: address,
-      //   latitude: position.latitude,
-      //   longitude: position.longitude,
-      // ));
     } catch (e) {
       // Handle any errors that occur during location fetching
       validSnackBar('Error fetching location: $e');

@@ -57,6 +57,7 @@
        <service
            android:name=".LocationService"
            android:exported="false"
+           android:stopWithTask="true"
            android:foregroundServiceType="location" />
 
        <!-- Don't delete the meta-data below.

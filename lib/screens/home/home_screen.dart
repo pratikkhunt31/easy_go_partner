@@ -55,9 +55,10 @@ class _HomeScreenState extends State<HomeScreen> {
     isVerified =
         false; // Initialize with false until verification status is fetched
     isLoading = true;
-    if (isOnline) {
-      startLocationUpdates();
-    }
+    // if (isOnline) {
+    //   startLocationUpdates();
+    // }
+    updateDriverLocationForAllPendingRides();
   }
 
   @override
@@ -338,15 +339,14 @@ class _HomeScreenState extends State<HomeScreen> {
     Location location = Location();
     locationSubscription =
         location.onLocationChanged.listen((LocationData currentLocation) {
-      updateDriverLocationForAllPendingRides(currentLocation);
+      updateDriverLocationForAllPendingRides();
     });
     if (!mounted) {
       location.enableBackgroundMode(enable: true);
     }
   }
 
-  void updateDriverLocationForAllPendingRides(
-      LocationData currentLocation) async {
+  void updateDriverLocationForAllPendingRides() async {
     if (currentUser == null) {
       print("User is not logged in");
       return;
@@ -369,18 +369,6 @@ class _HomeScreenState extends State<HomeScreen> {
           Map<String, dynamic> rideData = Map<String, dynamic>.from(value);
           if (rideData['status'] == 'pending') {
             LocationServicePlugin.startLocationService(key);
-            DatabaseReference rideRequestRef = FirebaseDatabase.instance
-                .ref()
-                .child('Ride Request')
-                .child(key);
-
-            rideRequestRef.update({
-              'd_location': {
-                'latitude': currentLocation.latitude.toString(),
-                'longitude': currentLocation.longitude.toString(),
-              },
-            });
-            // print(rideRequestRef.key);
           }
         });
       } else {
@@ -692,3 +680,16 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 }
+
+// DatabaseReference rideRequestRef = FirebaseDatabase.instance
+//     .ref()
+//     .child('Ride Request')
+//     .child(key);
+//
+// rideRequestRef.update({
+// 'd_location': {
+// 'latitude': currentLocation.latitude.toString(),
+// 'longitude': currentLocation.longitude.toString(),
+// },
+// });
+// print(rideRequestRef.key);
